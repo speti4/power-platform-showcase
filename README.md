@@ -38,7 +38,7 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 <details>
 
-<summary><h2>MS Learn transcriptem</summary>
+<summary><h2> MS Learn transcriptem</summary>
 
 > Elméleti tudás validáció
 > 
@@ -46,9 +46,14 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 </details>
 
-<summary><h2>Hands-on tapasztalatok</summary>
+<details>
+
+<summary><h2> Hands-on tapasztalatok</summary>
 
 ### Jira Logger
+[Main flow link](https://make.powerautomate.com/environments/Default-e630c74d-c398-49fa-a067-c561ab5e8096/solutions/~preferred/flows/96728491-0213-ef11-9f89-000d3ab81244/details)
+
+[samples/jira-logger-solution/src/](samples/jira-logger-solution/src/)
 
 ### Számlaleadás app
 
