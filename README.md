@@ -2,6 +2,11 @@
 
 Az elmúlt hónapokban célzottan, rendszerszinten tanultam a Microsoft Power Platform technológiát, azzal a szándékkal, hogy ne csak App Maker, hanem **Developer és Solution Architect** szinten is átlássam a működését.
 
+## 📖 MS Learn transcriptem
+> Elméleti tudás validáció
+> 
+[Microsoft Learn Transcript link - Szőke Péter](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
+
 ## Power Platform kompetenciák
 
 ![Microsoft Power Platform cert roadmap](docs/cert-roadmap.jpg)
@@ -21,28 +26,14 @@ A funkcionális tanácsadó szint: canvas‑ és model‑driven appok építé
 
 **PL-400: Microsoft Power Platform Developer**
 
-Fejlesztői szint: ismeri és használja a Power Platform teljes eszköztárát, ALM alkalmazása, plusz a kiterjesztése pro-codedal
-- custom API‑csatlakozók
-- egyéni plug‑inek
+Fejlesztői szint: Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok alkalmazása, ismeri és használja a Power Platform teljes eszköztárát, képes kiterjeszteni pro-codedal - .NET (C#) és JavaScript
+- API-k és egyéni csatlakozók integrálása
+- egyéni plug‑inek és code componentek
 - Power Apps Component Framework (PCF) vezérlők írása
-- .NET vagy JavaScript háttér és a PL‑200‑as ismeretek elvárt előfeltétel.
-- Célcsoport: Fejlesztők, akik technikai megoldásokat hoznak létre a Power Platformon.
-- Fókuszterületek:
-  - Egyéni pluginek és kódkomponensek fejlesztése.
-  - API-k és egyéni csatlakozók integrálása.
-  - Power Apps Component Framework (PCF) használata.
-  - Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok alkalmazása.
 
 **PL-600: Microsoft Power Platform Solution Architect**
-- Célcsoport: Megoldásarchitekták, akik átfogó megoldásokat terveznek és valósítanak meg.
-- Fókuszterületek:
-  - Üzleti és technikai követelmények összegyűjtése és elemzése.
-  - Megoldásarchitektúrák tervezése és dokumentálása.
-  - Kockázatok azonosítása és kezelése.
-  - Csapatok közötti együttműködés és kommunikáció biztosítása.
 
-## 📖 Nyilvános MS Learn transcriptem:  
-[Microsoft Learn Transcript](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
+Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, irányítja a fejlesztést, felügyeli a governancet, a megfelelőséget és külső rendszerek integrációját.
 
 ---
 
