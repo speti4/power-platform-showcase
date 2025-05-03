@@ -10,6 +10,7 @@ A Power Platform az alábbi low‑code eszközökből áll:
 - (Power BI, Power Pages, Power Virtual Agents – most nem fókusz)  
 
 ![power-platform-components](docs/power-platform-2.jpg)
+[^1]
 
 ## Miért jó választás IT szempontból?  
 
@@ -64,3 +65,7 @@ A Power Apps egy olyan eszköz, amely:
 - rugalmas (canvas és model‑driven megközelítések),  
 - kiterjeszthető (pro‑code irányba is),  
 - és az IT kezében marad (governance, jogosultságok, verziókezelés).   -->
+---
+Kép hivatkozások
+
+[^1]: [HSO Blog](https://www.hso.com/blog/microsoft-power-platform)

@@ -37,9 +37,9 @@ Fejlesztői szint: Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok 
 
 Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, irányítja a fejlesztést, felügyeli a governancet, a megfelelőséget és külső rendszerek integrációját.
 
----
+<!-- ---
 
-<!-- ## Pilot projekt: szerződéskezelés újragondolva Power Platformon
+## Pilot projekt: szerződéskezelés újragondolva Power Platformon
 
 ### Üzleti kihívás
 
