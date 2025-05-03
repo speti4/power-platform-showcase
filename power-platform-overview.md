@@ -10,7 +10,6 @@ A Power Platform az alábbi low‑code eszközökből áll:
 - (Power BI, Power Pages, Power Virtual Agents – most nem fókusz)  
 
 ![power-platform-components](docs/power-platform-2.jpg)
-
 [^1]
 
 ## Miért jó választás IT szempontból?  
@@ -51,6 +50,9 @@ Fő beépített képességek:
 
 A Dataverse tehát nem csupán tároló, hanem egy komplett, skálázható adat‑ és szabálymotor, amely biztonságosan szolgálja ki a teljes Power Platform ökoszisztémát.
 
+![dataverse-service-breakdown](docs/dataverse-service-breakdown-1.jpg)
+[^2]
+
 
 <!-- ### Pro‑code integráció lehetőségei  
 
@@ -70,3 +72,5 @@ A Power Apps egy olyan eszköz, amely:
 Kép hivatkozások
 
 [^1]: [HSO Blog](https://www.hso.com/blog/microsoft-power-platform)
+
+[^2]: [Carsten Groth blog](https://carstengroth.wordpress.com/category/dataverse/)
