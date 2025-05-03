@@ -53,11 +53,14 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 ### Jira Logger
 [Main flow link](https://make.powerautomate.com/environments/Default-e630c74d-c398-49fa-a067-c561ab5e8096/solutions/~preferred/flows/96728491-0213-ef11-9f89-000d3ab81244/details)
 
-[samples/jira-logger-solution/src/](samples/jira-logger-solution/src/)
+[Source code](samples/jira-logger-solution/src/Workflows/)
 
 ### Számlaleadás app
+[App link](https://make.powerapps.com/environments/Default-e630c74d-c398-49fa-a067-c561ab5e8096/apps/3917f23d-9be1-4b99-97d4-7bfb0d584bb1/details)
 
-### 
+[Source code](samples/szamlaleadas/src/Src/)
+
+### Egyéb minták - nem prod
 
 </details>
 

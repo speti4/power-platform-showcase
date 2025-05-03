@@ -1,0 +1,97 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceName": {
+      "type": "string",
+      "defaultValue": "inventorymanagement"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "West US 2"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "appServicePlan": {
+      "name": "[format('asplan-{0}', parameters('resourceName'))]",
+      "location": "[parameters('location')]"
+    },
+    "appService": {
+      "name": "[format('apiapp-{0}', parameters('resourceName'))]",
+      "location": "[parameters('location')]"
+    },
+    "apiManagement": {
+      "name": "[format('apim-{0}', parameters('resourceName'))]",
+      "location": "[parameters('location')]",
+      "productName": "development"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('appServicePlan').name]",
+      "location": "[variables('appServicePlan').location]",
+      "kind": "app",
+      "sku": {
+        "name": "S1",
+        "tier": "Standard",
+        "size": "S1",
+        "family": "S",
+        "capacity": 1
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "name": "[variables('appService').name]",
+      "location": "[variables('appService').location]",
+      "kind": "app",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlan').name)]",
+        "httpsOnly": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlan').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('apiManagement').name]",
+      "location": "[variables('apiManagement').location]",
+      "sku": {
+        "name": "Consumption",
+        "capacity": 0
+      },
+      "properties": {
+        "publisherEmail": "crystal@vanarsdel.com",
+        "publisherName": "VanArsdel",
+        "notificationSenderEmail": "apimgmt-noreply@vanarsdel.com"
+      }
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products",
+      "apiVersion": "2020-12-01",
+      "name": "[format('{0}/{1}', variables('apiManagement').name, variables('apiManagement').productName)]",
+      "properties": {
+        "displayName": "Development",
+        "description": "For development",
+        "subscriptionRequired": true,
+        "approvalRequired": false,
+        "state": "published"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apiManagement').name)]"
+      ]
+    }
+  ],
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.1.62928",
+      "templateHash": "3965953645434788759"
+    }
+  }
+}
