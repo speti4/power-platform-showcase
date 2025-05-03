@@ -4,8 +4,10 @@ Az elmúlt hónapokban célzottan, rendszerszinten tanultam a Microsoft Power Pl
 
 ## 📖 MS Learn transcriptem
 > Elméleti tudás validáció
-> 
+
 [Microsoft Learn Transcript link - Szőke Péter](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
+
+## [Alapfogalmak, áttekintés](/power-platform-overview.md)
 
 ## Power Platform kompetenciák
 
