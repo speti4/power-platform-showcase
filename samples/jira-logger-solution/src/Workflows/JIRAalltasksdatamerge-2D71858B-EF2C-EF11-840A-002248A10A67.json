@@ -1,0 +1,599 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness-1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedexcelonlinebusiness_6b366"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      },
+      "shared_sharepointonline-1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "staticResults": {
+        "Update_file_-_all_tasks.csv0": {
+          "status": "Succeeded",
+          "outputs": {
+            "statusCode": "OK"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "1c45a051-8b34-4c5f-bbe0-deff067961b0"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_TaskProps": {
+          "runAfter": {
+            "Define_YEAR": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7a83986a-5a2a-4b21-9204-804a65f2de13"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "TaskProps",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "List_rows_present_in_a_table": {
+          "runAfter": {
+            "Initialize_TaskProps": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01FSZZIXYS4K5MSMEWVZAIJKQSN5JDKZKL": "/manual_worklogs/manual_worklogs.xlsx",
+            "tableId": "TableForPowerAutomate"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+              "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+              "file": "01FSZZIXYS4K5MSMEWVZAIJKQSN5JDKZKL",
+              "table": "TableForPowerAutomate"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "description": "get manual_worklogs"
+        },
+        "Select_Datum_+_Kod": {
+          "runAfter": {
+            "List_rows_present_in_a_table": [
+              "Succeeded"
+            ]
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@outputs('List_rows_present_in_a_table')?['body/value']",
+            "select": {
+              "Datum": "@addDays('1899-12-30',int(item()?['Datum']),'yyyy.MM.dd.')",
+              "Kod": "@item()?['Kod']"
+            }
+          },
+          "description": "Datum: addDays('1899-12-30',int(item()?['Datum']),'yyyy.MM.dd.')"
+        },
+        "Apply_to_each": {
+          "foreach": "@body('Select_Datum_+_Kod')",
+          "actions": {
+            "HTTP_GET_Issue": {
+              "metadata": {
+                "operationMetadataId": "d7d79993-82f3-4bb9-b620-33296bbf856b"
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "https://jira.profession.hu/rest/api/2/issue/@{item()['Kod']}",
+                "method": "GET",
+                "authentication": {
+                  "type": "Basic",
+                  "username": "powerautomate",
+                  "password": "Profession2024"
+                }
+              },
+              "description": "URI: https://jira.profession.hu/rest/api/2/issue/@{item()['Kod']}",
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Compose_Resolution_Name": {
+              "runAfter": {
+                "HTTP_GET_Issue": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@if(empty(body('HTTP_GET_Issue').fields.resolution), '', body('HTTP_GET_Issue').fields.resolution.name)",
+              "description": "if(empty(body('HTTP_GET_Issue').fields.resolution), '', body('HTTP_GET_Issue').fields.resolution.name)"
+            },
+            "Compose_ResolutionDate": {
+              "runAfter": {
+                "Compose_Resolution_Name": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@if(empty(body('HTTP_GET_Issue').fields.resolutiondate), '', formatDateTime(body('HTTP_GET_Issue').fields.resolutiondate,'yyyy.MM.dd.'))\n",
+              "description": "if(empty(body('HTTP_GET_Issue').fields.resolutiondate), '', formatDateTime(body('HTTP_GET_Issue').fields.resolutiondate,'yyyy.MM.dd.'))\n"
+            },
+            "Compose_Created": {
+              "runAfter": {
+                "Compose_ResolutionDate": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@formatDateTime(body('HTTP_GET_Issue').fields.created,'yyyy.MM.dd.')\n",
+              "description": "formatDateTime(body('HTTP_GET_Issue').fields.created,'yyyy.MM.dd.')"
+            },
+            "Compose_TaskProps": {
+              "runAfter": {
+                "Compose_Created": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": [
+                {
+                  "Issue type": "@body('HTTP_GET_Issue').fields.issuetype.name",
+                  "Issue key": "@item()['Kod']",
+                  "Reporter": "@body('HTTP_GET_Issue').fields.reporter.name",
+                  "Priority": "@body('HTTP_GET_Issue').fields.priority.name",
+                  "Epic link": "@body('HTTP_GET_Issue').fields.customfield_10006",
+                  "Komponens kod": "@body('HTTP_GET_Issue')['fields']?['project']?['key']",
+                  "Created": "@outputs('Compose_Created')",
+                  "Resolution Name": "@outputs('Compose_Resolution_Name')",
+                  "Resolutiondate": "@outputs('Compose_ResolutionDate')",
+                  "Status Name": "@body('HTTP_GET_Issue').fields.status.name",
+                  "Timeoriginal estimate": "@body('HTTP_GET_Issue').fields.timeoriginalestimate",
+                  "Timespent": "@body('HTTP_GET_Issue').fields.timespent"
+                }
+              ]
+            },
+            "Compose_TaskProps_Array": {
+              "runAfter": {
+                "Compose_TaskProps": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@union(variables('TaskProps'), outputs('Compose_TaskProps'))",
+              "description": "union(variables('TaskProps'), outputs('Compose_TaskProps'))"
+            },
+            "Set_TaskProps": {
+              "runAfter": {
+                "Compose_TaskProps_Array": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "TaskProps",
+                "value": "@outputs('Compose_TaskProps_Array')"
+              }
+            }
+          },
+          "runAfter": {
+            "Select_Datum_+_Kod": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "Create_CSV_table": {
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@variables('TaskProps')",
+            "format": "CSV"
+          }
+        },
+        "Create_file_-_all_tasks_manual.csv": {
+          "runAfter": {
+            "Create_CSV_table": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+              "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/alltasks",
+              "name": "all_tasks_manual.csv",
+              "body": "@concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "CreateFile",
+              "connectionName": "shared_sharepointonline-1"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Initialize_Enter": {
+          "runAfter": {
+            "Create_file_-_all_tasks_manual.csv": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Enter",
+                "type": "string",
+                "value": "\n"
+              }
+            ]
+          }
+        },
+        "Initialize_MergeString": {
+          "runAfter": {
+            "Initialize_Enter": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "mergeString",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Get_file_content_-_alltasksYYYY": {
+          "runAfter": {
+            "Apply_to_each_archive": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fall_tasks_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/all_tasks_2024.csv",
+            "%252fShared%2bDocuments%252fjira_riports%252fall_tasks_2024.csv": "/Shared Documents/jira_riports/all_tasks_2024.csv"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "id": "%252fShared%2bDocuments%252fjira_riports%252fall_tasks_@{outputs('Define_YEAR')}.csv",
+              "inferContentType": true
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "GetFileContent",
+              "connectionName": "shared_sharepointonline-1"
+            }
+          },
+          "description": "%252fShared%2bDocuments%252fjira_riports%252fall_tasks_@outputs('Define_YEAR').csv\n"
+        },
+        "Get_file_content_-_alltasks_manual": {
+          "runAfter": {
+            "Get_file_content_-_alltasksYYYY": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fall_tasks_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/all_tasks_2024.csv",
+            "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fall_tasks_manual.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/all_tasks_manual.csv",
+            "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252falltasks%252fall_tasks_manual.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_manual.csv"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+              "id": "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252falltasks%252fall_tasks_manual.csv",
+              "inferContentType": true
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "GetFileContent",
+              "connectionName": "shared_sharepointonline-1"
+            }
+          }
+        },
+        "Compose_alltasks": {
+          "runAfter": {
+            "Get_file_content_-_alltasks_manual": [
+              "Succeeded"
+            ]
+          },
+          "type": "Compose",
+          "inputs": "@{variables('mergeArchive')}@{skip(base64ToString(body('Get_file_content_-_alltasksYYYY')['$content']),add(indexOf(base64ToString(body('Get_file_content_-_alltasksYYYY')['$content']),variables('Enter')),1))}@{skip(base64ToString(body('Get_file_content_-_alltasks_manual')['$content']),add(indexOf(base64ToString(body('Get_file_content_-_alltasks_manual')['$content']),variables('Enter')),1))}",
+          "description": "skip(base64ToString(body('Get_file_content_-_alltasks_manual')['$content']),add(indexOf(base64ToString(body('Get_file_content_-_alltasks_manual')['$content']),variables('Enter')),1))"
+        },
+        "Set_mergeString": {
+          "runAfter": {
+            "Compose_alltasks": [
+              "Succeeded"
+            ]
+          },
+          "type": "SetVariable",
+          "inputs": {
+            "name": "mergeString",
+            "value": "@replace(outputs('Compose_alltasks'),uriComponentToString('%EF%BB%BF'), '')"
+          },
+          "description": "replace(outputs('Compose_alltasks'),uriComponentToString('%EF%BB%BF'), '')\nha alltasks manual ures, Zero-Width No-Break Space karakter kerul a merge stringbe, ezt torli ez a sor"
+        },
+        "Update_file_-_all_tasks.csv": {
+          "runAfter": {
+            "Set_mergeString": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fall_tasks.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/all_tasks.csv",
+            "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv": "/Shared Documents/jira_riports/all_tasks.csv"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "id": "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv",
+              "body": "@concat(uriComponentToString('%EF%BB%BF'),variables('mergeString'))"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "UpdateFile",
+              "connectionName": "shared_sharepointonline-1"
+            }
+          },
+          "description": "concat(uriComponentToString('%EF%BB%BF'),variables('mergeString'))"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Update_file_-_all_tasks.csv": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {}
+            },
+            "statusCode": 200
+          }
+        },
+        "Define_YEAR": {
+          "runAfter": {},
+          "type": "Compose",
+          "inputs": "@convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')",
+          "description": "convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')"
+        },
+        "Initialize_mergeArchive": {
+          "runAfter": {
+            "Initialize_MergeString": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "mergeArchive",
+                "type": "string",
+                "value": "Issue type,Issue key,Reporter,Priority,Epic link,Komponens kod,Created,Resolution Name,Resolutiondate,Status Name,Timeoriginal estimate,Timespent@{variables('Enter')}"
+              }
+            ]
+          }
+        },
+        "collect_archive_files": {
+          "actions": {
+            "List_folder_-_jiraworklog_archive": {
+              "metadata": {
+                "%252fShared%2bDocuments%252farchive": "/Shared Documents/archive"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "id": "%252fShared%2bDocuments%252farchive"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "ListFolder",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Select": {
+              "runAfter": {
+                "List_folder_-_jiraworklog_archive": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Select",
+              "inputs": {
+                "from": "@body('List_folder_-_jiraworklog_archive')",
+                "select": {
+                  "name": "@item()?['Name']",
+                  "isFolder": "@item()?['IsFolder']",
+                  "id": "@item()?['Id']"
+                }
+              }
+            },
+            "Filter_out_folders": {
+              "runAfter": {
+                "Select": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@body('Select')",
+                "where": "@equals(item()['isFolder'],false)"
+              },
+              "description": "item()['isFolder'] = false"
+            },
+            "Filter_filename": {
+              "runAfter": {
+                "Filter_out_folders": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@body('Filter_out_folders')",
+                "where": "@contains(item()['name'],'all_tasks')"
+              },
+              "description": "item()['name'] contains worklogs"
+            },
+            "Filter_filename_length": {
+              "runAfter": {
+                "Filter_filename": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@body('Filter_filename')",
+                "where": "@equals(length(item()['name']),length('all_tasks_yyyy.csv'))"
+              },
+              "description": "length(item()['name']) = length('all_tasks_yyyy.csv')"
+            },
+            "Filter_past_years": {
+              "runAfter": {
+                "Filter_filename_length": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Query",
+              "inputs": {
+                "from": "@body('Filter_filename_length')",
+                "where": "@less(substring(item()['name'],add(length(item()['name']),-8),4),outputs('Define_YEAR'))"
+              },
+              "description": "substring(item()['name'],add(length(item()['name']),-8),4)   <   this year"
+            },
+            "Sort_by_year": {
+              "runAfter": {
+                "Filter_past_years": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@sort(body('Filter_past_years'),'name')",
+              "description": "sort(body('Filter_past_years'),'name')"
+            }
+          },
+          "runAfter": {
+            "Initialize_mergeArchive": [
+              "Succeeded"
+            ]
+          },
+          "type": "Scope"
+        },
+        "Apply_to_each_archive": {
+          "foreach": "@outputs('Sort_by_year')",
+          "actions": {
+            "Get_archive_file_content": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "id": "@item()['id']",
+                  "inferContentType": true
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileContent",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              },
+              "description": "item()['id']"
+            },
+            "Compose_mergeArchive": {
+              "runAfter": {
+                "Get_archive_file_content": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@{variables('mergeArchive')}@{skip(base64ToString(outputs('Get_archive_file_content')?['body']['$content']),add(indexOf(base64ToString(outputs('Get_archive_file_content')?['body']['$content']),variables('Enter')),1))}",
+              "description": "skip(base64ToString(outputs('Get_archive_file_content')?['body']['$content']),add(indexOf(base64ToString(outputs('Get_archive_file_content')?['body']['$content']),variables('Enter')),1))"
+            },
+            "Set_mergeArchive": {
+              "runAfter": {
+                "Compose_mergeArchive": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "mergeArchive",
+                "value": "@outputs('Compose_mergeArchive')"
+              }
+            }
+          },
+          "runAfter": {
+            "collect_archive_files": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach",
+          "description": "archive fajlok osszefuzese"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

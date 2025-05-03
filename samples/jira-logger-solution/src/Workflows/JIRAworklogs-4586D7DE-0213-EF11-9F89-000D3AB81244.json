@@ -1,0 +1,722 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "undefined",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "805c1e6e-6416-4e23-bee7-7ee7d02dbd50"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "enter worklogAuthor name",
+                  "title": "worklogAuthor",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "text_1": {
+                  "description": "3-digit-number",
+                  "title": "ID",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "text_2": {
+                  "description": "2024",
+                  "title": "worklogDate",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2"
+              ]
+            },
+            "headersSchema": {
+              "x-ms-user-name-encoded": {
+                "title": "User name",
+                "type": "string",
+                "format": "byte",
+                "x-ms-dynamically-added": false
+              },
+              "x-ms-user-email-encoded": {
+                "title": "User email",
+                "type": "string",
+                "format": "byte",
+                "x-ms-dynamically-added": false
+              },
+              "x-ms-user-timestamp": {
+                "title": "Timestamp",
+                "type": "string",
+                "x-ms-dynamically-added": false
+              }
+            }
+          },
+          "description": "JIRA Logger parent flow triggereli 3 inputtal"
+        }
+      },
+      "actions": {
+        "Initialize_startAt": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "6db3f6ce-9b03-4092-bbd5-bd330685b43f"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "startAt",
+                "type": "integer",
+                "value": 0
+              }
+            ]
+          },
+          "description": "jql query + lapozas"
+        },
+        "Total_more_than_0": {
+          "actions": {},
+          "runAfter": {
+            "Get_Issue_IDs_-_paging": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Terminate_Succeded_-_0_worklog": {
+                "runAfter": {
+                  "Create_empty_file_for_processing": [
+                    "Succeeded"
+                  ]
+                },
+                "type": "Terminate",
+                "inputs": {
+                  "runStatus": "Succeeded"
+                }
+              },
+              "Create_empty_file_for_processing": {
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "parameters": {
+                    "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                    "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/nincs_worklog",
+                    "name": "@{triggerBody()?['text']}_noworklog",
+                    "body": "\"\""
+                  },
+                  "host": {
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                    "operationId": "CreateFile",
+                    "connectionName": "shared_sharepointonline"
+                  }
+                },
+                "runtimeConfiguration": {
+                  "contentTransfer": {
+                    "transferMode": "Chunked"
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "greater": [
+                  "@variables('total')",
+                  0
+                ]
+              }
+            ]
+          },
+          "type": "If",
+          "description": "ha nincs issueid, sikeres eredmennyel terminal"
+        },
+        "Initialize_total": {
+          "runAfter": {
+            "Initialize_startAt": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e8ff5a6f-4ece-42d1-8d1c-e5d1afda9fee"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "total",
+                "type": "integer",
+                "value": 1
+              }
+            ]
+          },
+          "description": "lapozas miatt - osszes issue szama"
+        },
+        "Initialize_issueIds": {
+          "runAfter": {
+            "Initialize_total": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ae10ed52-9890-483d-ad53-15b56a665fe0"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "issueIds",
+                "type": "array"
+              }
+            ]
+          },
+          "description": "body > [issues] > id"
+        },
+        "Initialize_worklogItems": {
+          "runAfter": {
+            "Initialize_issueIds": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8d64b9aa-c317-42aa-86ea-f0234c9414b4"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "worklogItems",
+                "type": "array"
+              }
+            ]
+          },
+          "description": "worklog data tarolasa tombben"
+        },
+        "Get_Issue_IDs_-_paging": {
+          "actions": {
+            "Compose_JQL": {
+              "type": "Compose",
+              "inputs": "worklogAuthor='@{triggerBody()?['text']}'&worklogDate>=@{triggerBody()?['text_2']}-01-01&worklogDate<=@{triggerBody()?['text_2']}-12-31",
+              "description": "jql query filter a http requesthez\nworklogauthor + worklogdate"
+            },
+            "HTTP_GET_Issue_IDs": {
+              "runAfter": {
+                "Compose_JQL": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "https://jira.profession.hu/rest/api/2/search",
+                "method": "GET",
+                "queries": {
+                  "jql": "@{outputs('Compose_JQL')}",
+                  "startAt": "@{variables('startAt')}",
+                  "maxResults": "50",
+                  "fields": "summary"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "value": "Bearer MDA2NjM1MjExNDU2Op93JQFnnS8QpVqGc/mOfr/Olu2D"
+                }
+              },
+              "description": "issues tomb id ertekek kigyujtese\nfields query filter a gyorsabb futas erdekeben",
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Set_total": {
+              "runAfter": {
+                "HTTP_GET_Issue_IDs": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "total",
+                "value": "@outputs('HTTP_GET_Issue_IDs')?['body']?['total']"
+              },
+              "description": "outputs('HTTP_GET_Issue_IDs')?['body']?['total']"
+            },
+            "Increment_startAt_+_50": {
+              "runAfter": {
+                "Set_total": [
+                  "Succeeded"
+                ]
+              },
+              "type": "IncrementVariable",
+              "inputs": {
+                "name": "startAt",
+                "value": 50
+              },
+              "description": "lapozas"
+            },
+            "Select_Issue_IDs": {
+              "runAfter": {
+                "Increment_startAt_+_50": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Select",
+              "inputs": {
+                "from": "@outputs('HTTP_GET_Issue_IDs')?['body']?['issues']",
+                "select": {
+                  "IssueId": "@item()?['key']"
+                }
+              },
+              "description": "from: outputs('HTTP_GET_Issue_IDs')?['body']?['issues']\nIssueId: item()?['key']"
+            },
+            "Merge_Issue_IDs": {
+              "runAfter": {
+                "Select_Issue_IDs": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@union(variables('issueIds'), body('Select_Issue_IDs'))",
+              "description": "issue id-k rekurziv osszefuzese"
+            },
+            "Set_issueIds": {
+              "runAfter": {
+                "Merge_Issue_IDs": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "issueIds",
+                "value": "@outputs('Merge_Issue_IDs')"
+              }
+            }
+          },
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Succeeded"
+            ]
+          },
+          "expression": "@greaterOrEquals(variables('startAt'),variables('total'))",
+          "limit": {
+            "count": 60,
+            "timeout": "PT1H"
+          },
+          "type": "Until",
+          "description": "Do until var(startAt) is greater or equal to var(total)"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Initialize_response": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "db4864f7-cc62-4f8e-8f1d-dc642592fcc2"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {}
+          },
+          "description": "respond a parent flownak output nelkul, igy egybol indul a kovetkezo lekerdezes"
+        },
+        "Apply_to_each_Issue_ID": {
+          "foreach": "@variables('issueIds')",
+          "actions": {
+            "Compose_worklog_total": {
+              "runAfter": {
+                "Do_until_HTTP_200": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@outputs('HTTP_GET_worklog_data')?['body']?['fields']?['worklog']?['total']",
+              "description": "outputs('HTTP_GET_worklog_data')?['body']?['fields']?['worklog']?['total']"
+            },
+            "Worklog_total_20+": {
+              "actions": {
+                "HTTP_GET_worklog_20+_data": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "https://jira.profession.hu/rest/api/2/issue/@{items('Apply_to_each_Issue_ID')?['IssueId']}/worklog",
+                    "method": "GET",
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "Bearer MDA2NjM1MjExNDU2Op93JQFnnS8QpVqGc/mOfr/Olu2D"
+                    }
+                  },
+                  "description": "items('Apply_to_each_Issue_ID')?['IssueId']",
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  }
+                },
+                "Select_worklog_items_20+": {
+                  "runAfter": {
+                    "HTTP_GET_worklog_20+_data": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Select",
+                  "inputs": {
+                    "from": "@outputs('HTTP_GET_worklog_20+_data')?['body']?['worklogs']",
+                    "select": {
+                      "Kod": "@outputs('HTTP_GET_worklog_data')?['body']?['key']",
+                      "Komponens kod": "@outputs('HTTP_GET_worklog_data')?['body']?['fields']?['project']?['key']",
+                      "name": "@item()?['updateAuthor']?['name']",
+                      "displayName": "@item()?['updateAuthor']?['displayName']",
+                      "started": "@item()?['started']",
+                      "timeSpent": "@item()?['timeSpentSeconds']"
+                    }
+                  }
+                },
+                "Filter_worklogAuthor_20+": {
+                  "runAfter": {
+                    "Select_worklog_items_20+": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Query",
+                  "inputs": {
+                    "from": "@body('Select_worklog_items_20+')",
+                    "where": "@equals(item()?['name'],triggerBody()?['text'])"
+                  }
+                },
+                "Filter_startDate1_20+": {
+                  "runAfter": {
+                    "Filter_worklogAuthor_20+": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Query",
+                  "inputs": {
+                    "from": "@body('Filter_worklogAuthor_20+')",
+                    "where": "@greaterOrEquals(item()?['started'],concat(triggerBody()?['text_2'],'-01-01'))"
+                  },
+                  "description": "@greaterOrEquals(@{item()?['started']},@{concat(triggerBody()?['text_2'],'-01-01')})"
+                },
+                "Merge_worklog_items_20+": {
+                  "runAfter": {
+                    "Filter_startDate2_20+": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Compose",
+                  "inputs": "@union(variables('worklogItems'),body('Filter_startDate2_20+'))"
+                },
+                "Set_worklogItems2": {
+                  "runAfter": {
+                    "Merge_worklog_items_20+": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "worklogItems",
+                    "value": "@outputs('Merge_worklog_items_20+')"
+                  }
+                },
+                "Filter_startDate2_20+": {
+                  "runAfter": {
+                    "Filter_startDate1_20+": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Query",
+                  "inputs": {
+                    "from": "@body('Filter_startDate1_20+')",
+                    "where": "@lessOrEquals(item()?['started'],concat(triggerBody()?['text_2'],'-12-31'))"
+                  },
+                  "description": "@lessOrEquals(@{item()?['started']},@{concat(triggerBody()?['text_2'],'-12-31')})"
+                }
+              },
+              "runAfter": {
+                "Compose_worklog_total": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Select_worklog_items": {
+                    "type": "Select",
+                    "inputs": {
+                      "from": "@outputs('HTTP_GET_worklog_data')?['body']?['fields']?['worklog']?['worklogs']",
+                      "select": {
+                        "Kod": "@outputs('HTTP_GET_worklog_data')?['body']?['key']",
+                        "Komponens kod": "@outputs('HTTP_GET_worklog_data')?['body']?['fields']?['project']?['key']",
+                        "name": "@item()?['updateAuthor']?['name']",
+                        "displayName": "@item()?['updateAuthor']?['displayName']",
+                        "started": "@item()?['started']",
+                        "timeSpent": "@item()?['timeSpentSeconds']"
+                      }
+                    },
+                    "description": "From\noutputs('HTTP_GET_worklog_data')?['body']?['fields']?['worklog']?['worklogs']"
+                  },
+                  "Filter_startDate1": {
+                    "runAfter": {
+                      "Filter_worklogAuthor": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Query",
+                    "inputs": {
+                      "from": "@body('Filter_worklogAuthor')",
+                      "where": "@greaterOrEquals(item()?['started'],concat(triggerBody()?['text_2'],'-01-01'))"
+                    },
+                    "description": "HTTP request nem szurhető, ezert szurjuk az idei datumra\n@greaterOrEquals(@{item()?['started']},@{concat(triggerBody()?['text_2'],'-01-01')})"
+                  },
+                  "Merge_worklog_items": {
+                    "runAfter": {
+                      "Filter_startDate2": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Compose",
+                    "inputs": "@union(variables('worklogItems'),body('Filter_startDate2'))",
+                    "description": "worklog adatok rekurziv osszefuzese\nunion(variables('worklogItems'),body('Filter_startDate2'))"
+                  },
+                  "Filter_startDate2": {
+                    "runAfter": {
+                      "Filter_startDate1": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Query",
+                    "inputs": {
+                      "from": "@body('Filter_startDate1')",
+                      "where": "@lessOrEquals(item()?['started'],concat(triggerBody()?['text_2'],'-12-31'))"
+                    },
+                    "description": "ev vege szures\n@lessOrEquals(@{item()?['started']},@{concat(triggerBody()?['text_2'],'-12-31')})"
+                  },
+                  "Filter_worklogAuthor": {
+                    "runAfter": {
+                      "Select_worklog_items": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "Query",
+                    "inputs": {
+                      "from": "@body('Select_worklog_items')",
+                      "where": "@equals(item()?['name'],triggerBody()?['text'])"
+                    }
+                  },
+                  "Set_worklogItems": {
+                    "runAfter": {
+                      "Merge_worklog_items": [
+                        "Succeeded"
+                      ]
+                    },
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "worklogItems",
+                      "value": "@outputs('Merge_worklog_items')"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "greater": [
+                      "@outputs('Compose_worklog_total')",
+                      20
+                    ]
+                  }
+                ]
+              },
+              "type": "If",
+              "description": "ha worklogok szama >20, https://jira.profession.hu/rest/api/2/issue/{IssueId}/worklog request kilistazza az osszes worklogot"
+            },
+            "Do_until_HTTP_200": {
+              "actions": {
+                "HTTP_GET_worklog_data": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "https://jira.profession.hu/rest/api/2/issue/@{items('Apply_to_each_Issue_ID')['IssueId']}",
+                    "method": "GET",
+                    "queries": {
+                      "fields": "project, worklog"
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "Bearer MDA2NjM1MjExNDU2Op93JQFnnS8QpVqGc/mOfr/Olu2D"
+                    }
+                  },
+                  "description": "lekerdezes issue id-nkent\nitems('Apply_to_each_Issue_ID')['IssueId']\n\nfields query filter a gyorsabb futas erdekeben\nmax 20 worklogot jelenit meg",
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  }
+                },
+                "Set_response": {
+                  "runAfter": {
+                    "HTTP_GET_worklog_data": [
+                      "Succeeded",
+                      "Failed"
+                    ],
+                    "Delay_-_3sec": [
+                      "Succeeded",
+                      "Skipped"
+                    ]
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "response",
+                    "value": "@outputs('HTTP_GET_worklog_data')?['statusCode']"
+                  }
+                },
+                "Delay_-_3sec": {
+                  "runAfter": {
+                    "HTTP_GET_worklog_data": [
+                      "Failed"
+                    ]
+                  },
+                  "type": "Wait",
+                  "inputs": {
+                    "interval": {
+                      "count": 3,
+                      "unit": "Second"
+                    }
+                  },
+                  "description": "delay ha failel"
+                }
+              },
+              "expression": "@equals(variables('response'),200)",
+              "limit": {
+                "count": 5,
+                "timeout": "PT1H"
+              },
+              "type": "Until",
+              "description": "5x probalkozik ha hibara fut"
+            }
+          },
+          "runAfter": {
+            "Total_more_than_0": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach",
+          "description": "lekérdezés issue id-nkent + adatok kigyujtese"
+        },
+        "Create_CSV_table": {
+          "runAfter": {
+            "Apply_to_each_Issue_ID": [
+              "Succeeded"
+            ]
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@variables('worklogItems')",
+            "format": "CSV",
+            "columns": [
+              {
+                "header": "Datum",
+                "value": "@{formatDateTime(item()['started'],'yyyy.MM.dd.')}"
+              },
+              {
+                "header": "Kod",
+                "value": "@{item()['Kod']}"
+              },
+              {
+                "header": "Beszallito",
+                "value": "@{item()['displayName']}"
+              },
+              {
+                "header": "Logolt oraszam",
+                "value": "@{div(float(item()['timeSpent']), 3600)}"
+              },
+              {
+                "header": "Komponens kod",
+                "value": "@{item()['Komponens kod']}"
+              }
+            ]
+          },
+          "description": "logolt oraszam: float(timeSpentSeconds) / 3600\nDatum: formatDateTime(item()['started'],'yyyy.MM.dd.')"
+        },
+        "Create_file": {
+          "runAfter": {
+            "Create_CSV_table": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+              "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs",
+              "name": "@{triggerBody()?['text_1']}@{triggerBody()?['text']}.csv",
+              "body": "@concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "CreateFile",
+              "connectionName": "shared_sharepointonline"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Initialize_response": {
+          "runAfter": {
+            "Initialize_worklogItems": [
+              "Succeeded"
+            ]
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "response",
+                "type": "integer",
+                "value": 200
+              }
+            ]
+          },
+          "description": "http statuscode check-hez"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

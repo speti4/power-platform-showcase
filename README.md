@@ -2,15 +2,8 @@
 
 Az elmúlt hónapokban célzottan, rendszerszinten tanultam a Microsoft Power Platform technológiát, azzal a szándékkal, hogy ne csak App Maker, hanem **Developer és Solution Architect** szinten is átlássam a működését.
 
-<details>
+## [Alapfogalmak, áttekintés](/power-platform-overview.md)
 
-<summary><h2>📖 MS Learn transcriptem</summary>
-
-> Elméleti tudás validáció
-> 
-[Microsoft Learn Transcript link - Szőke Péter](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
-
-</details>
 
 <details>
 
@@ -43,7 +36,25 @@ Fejlesztői szint: Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok 
 Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, irányítja a fejlesztést, felügyeli a governancet, a megfelelőséget és külső rendszerek integrációját.
 </details>
 
-## [Alapfogalmak, áttekintés](/power-platform-overview.md)
+<details>
+
+<summary><h2>MS Learn transcriptem</summary>
+
+> Elméleti tudás validáció
+> 
+[Microsoft Learn Transcript link - Szőke Péter](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
+
+</details>
+
+<summary><h2>Hands-on tapasztalatok</summary>
+
+### Jira Logger
+
+### Számlaleadás app
+
+### 
+
+</details>
 
 <!-- ---
 

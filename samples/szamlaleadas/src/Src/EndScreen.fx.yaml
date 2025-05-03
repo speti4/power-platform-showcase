@@ -1,0 +1,60 @@
+EndScreen As screen:
+
+    ContainerElements1 As groupContainer:
+        Height: =1136
+        Width: =640
+        ZIndex: =1
+
+        imgLogo1 As image:
+            Height: =128
+            Image: =profession_logo
+            Width: =640
+            Y: =1008
+            ZIndex: =1
+
+        ButtonExit As button:
+            Fill: =RGBA(168, 0, 0, 1)
+            Height: =110
+            OnSelect: =Exit()
+            Size: =24
+            Text: ="Kilépés"
+            Width: =388
+            X: =126
+            Y: =743
+            ZIndex: =2
+
+        ButtonBack As button:
+            Fill: =RGBA(74, 88, 159, 1)
+            Height: =110
+            OnSelect: =Navigate(WelcomeScreen)
+            Size: =24
+            Text: ="Vissza a kezdőoldalra"
+            Width: =388
+            X: =126
+            Y: =600
+            ZIndex: =3
+
+        lblSummary As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =458
+            Size: =21
+            Text: |-
+                ="Köszönjük, hogy használtad az alkalmazást!
+                
+                Amennyiben szeretnél még számlát / mellékletet leadni,  lépj vissza a kezdőoldalra!"
+            Width: =560
+            X: =40
+            Y: =lblEndScreenTitle.Height + 10
+            ZIndex: =4
+
+        lblEndScreenTitle As label:
+            Align: =Align.Center
+            Color: =RGBA(255, 255, 255, 1)
+            Fill: =RGBA(50, 60, 80, 1)
+            Height: =120
+            Size: =27
+            Text: ="Sikeres számla beküldés!"
+            Width: =640
+            ZIndex: =5
+

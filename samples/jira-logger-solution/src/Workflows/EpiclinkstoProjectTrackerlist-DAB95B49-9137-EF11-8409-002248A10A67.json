@@ -1,0 +1,394 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness-1": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedexcelonlinebusiness_6b366"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_sharepointonline-1": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_80e5d"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "undefined",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "type": "Recurrence",
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Day",
+            "timeZone": "Central Europe Standard Time",
+            "schedule": {
+              "hours": [
+                "3",
+                "17"
+              ],
+              "minutes": [
+                10
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Run_script_from_SharePoint_library": {
+          "type": "OpenApiConnection",
+          "description": "epics-import-PROTECBAC-4237.xlsx\njira-export munkalap alapján Table generálás",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+              "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+              "file": "01FSZZIXY2QEK2P5IS4VHKMFZAS7GEIY5Y",
+              "scriptSource": "groups/9eae6b6a-69be-46fd-be72-a41fc4045d53",
+              "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "scriptId": "01AAKL2QMTHIIJR3TA4RDIIIZ2KSU2NS3E"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "RunScriptProdV2",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {},
+          "metadata": {
+            "01FSZZIXY2QEK2P5IS4VHKMFZAS7GEIY5Y": "/epics/epics-import-PROTECBAC-4237.xlsx",
+            "01AAKL2QMTHIIJR3TA4RDIIIZ2KSU2NS3E": "/sandbox_jiraepics/convert_to_table.osts",
+            "tableId": null
+          }
+        },
+        "Delay_1_sec": {
+          "type": "Wait",
+          "description": "következő action néha failel, ha nincs delay",
+          "inputs": {
+            "interval": {
+              "count": 1,
+              "unit": "Second"
+            }
+          },
+          "runAfter": {
+            "Run_script_from_SharePoint_library": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Select_ID_and_Epic_Link": {
+          "type": "Select",
+          "description": "ID : item()?['ID']\nEpic Link : concat('https://jira.profession.hu/browse/',item()?['Epic Key'])",
+          "inputs": {
+            "from": "@outputs('List_rows_present_in_epics-import-PROTECBAC-4237')?['body/value']",
+            "select": {
+              "ID": "@item()?['ID']",
+              "Epic Link": "@concat('https://jira.profession.hu/browse/',item()?['Epic Key'])",
+              "Epic Key": "@item()?['Epic Key']"
+            }
+          },
+          "runAfter": {
+            "List_rows_present_in_epics-import-PROTECBAC-4237": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Apply_to_each": {
+          "type": "Foreach",
+          "foreach": "@body('Select_ID_and_Epic_Link')",
+          "actions": {
+            "Get_item": {
+              "type": "OpenApiConnection",
+              "description": "item()['ID']",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/PMO",
+                  "table": "61c02b59-a220-4c81-81c4-82aff996d660",
+                  "id": "@item()['ID']"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetItem",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Condition": {
+              "type": "If",
+              "description": "body('Get_item')?['ProjectEpicLink'] = null\nitem()?['Epic Key'] <> ",
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@body('Get_item')?['ProjectEpicLink']",
+                      "@null"
+                    ]
+                  },
+                  {
+                    "not": {
+                      "equals": [
+                        "@item()?['Epic Key']",
+                        ""
+                      ]
+                    }
+                  }
+                ]
+              },
+              "actions": {
+                "Compose_true": {
+                  "type": "Compose",
+                  "description": "item()['Epic Link']",
+                  "inputs": "@item()['Epic Link']"
+                },
+                "Update_item": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://axelhu.sharepoint.com/sites/PMO",
+                      "table": "61c02b59-a220-4c81-81c4-82aff996d660",
+                      "id": "@body('Get_item')?['ID']",
+                      "item/Title": "@body('Get_item')?['Title']",
+                      "item/ProjectEpicLink": "@{item()['Epic Link']}"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline-1"
+                    }
+                  },
+                  "runAfter": {
+                    "Compose_true": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Compose_false": {
+                    "type": "Compose",
+                    "inputs": "van már link"
+                  }
+                }
+              },
+              "runAfter": {
+                "Get_item": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Select_ID_and_Epic_Link": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Apply_to_each_2": {
+          "type": "Foreach",
+          "foreach": "@body('Select_ID_and_Epic_Link')",
+          "actions": {
+            "Compose_Epic_Key": {
+              "type": "Compose",
+              "description": "{\"Epic Key\": \"item()['Epic Key']\"}",
+              "inputs": {
+                "Epic Key": "@{item()['Epic Key']}"
+              },
+              "runAfter": {
+                "Get_item_2": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Get_item_2": {
+              "type": "OpenApiConnection",
+              "description": "Id: item()['ID']",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/PMO",
+                  "table": "61c02b59-a220-4c81-81c4-82aff996d660",
+                  "id": "@item()['ID']"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetItem",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Condition_1": {
+              "type": "If",
+              "description": "itt checkolom, hogy a PRTOECBAC táblában lévő Epic Key szerepel-e már a referencia táblában\nbody('Select_Epic_Keys_from_referencia')  does not contain  outputs('Compose_Epic_Key')\nAND outputs('Coalesce_Stakeholderek') is not null",
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "contains": [
+                        "@body('Select_Epic_Keys_from_referencia')",
+                        "@outputs('Compose_Epic_Key')"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "actions": {
+                "Compose_true_2": {
+                  "type": "Compose",
+                  "inputs": "sor hozzáadása táblához, ide kellenek listából adatok"
+                },
+                "Add_a_row_into_a_table": {
+                  "type": "OpenApiConnection",
+                  "description": "Dátum: concat(formatDateTime(utcNow(),'yyyy'),'.01.01.')\nEpic ID: item()['Epic Key']\nCAPEX (Éves): alap + bónusz CAPEX\nPO: body('Get_item_2')?['Author']?['DisplayName']\nEpic Név: Project Epic név\nAlap CAPEX: projektbudzse\nBónusz CAPEX: 0\n",
+                  "inputs": {
+                    "parameters": {
+                      "source": "https://axelhu.sharepoint.com/sites/POkltsKPI",
+                      "drive": "b!oNk_Gu6F3Ueo7jpZSNkTgTwCqSAx3RdPvcGb9ZvZz8AJhXnTjUGRTYTskO2Qom8k",
+                      "file": "014TG3ICXO7JMNG7X44JEJWBLAAYBDAC6F",
+                      "table": "{9A6DD261-0640-4C08-8CB9-88000ADB303D}",
+                      "item/Dátum": "@{concat(formatDateTime(utcNow(),'yyyy'),'.01.01.')}",
+                      "item/Epic ID": "@{item()['Epic Key']}",
+                      "item/PO": "@body('Get_item_2')?['Author']?['DisplayName']",
+                      "item/Epic név": "@body('Get_item_2')?['ProjectEpicn_x00e9_v']",
+                      "item/Alap CAPEX": "@{body('Get_item_2')?['Projektb_x00fc_dzs_x00e9_']}"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                      "operationId": "AddRowV2",
+                      "connectionName": "shared_excelonlinebusiness-1"
+                    }
+                  },
+                  "runAfter": {
+                    "Compose_true_2": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "01AAKL2QKNZ4VCSA3VFNDJWGW3GIIK3S5U": "/sandbox_jiraepics/referencia.xlsx",
+                    "tableId": "{9A6DD261-0640-4C08-8CB9-88000ADB303D}",
+                    "01AAKL2QLUPT4NULV3KRDZ6SDKABZISTRO": "/sandbox_jiraepics/referencia.xlsx",
+                    "014TG3ICXO7JMNG7X44JEJWBLAAYBDAC6F": "/2023/referencia.xlsx"
+                  }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Compose_false_2": {
+                    "type": "Compose",
+                    "inputs": "már bent a referencia táblában"
+                  }
+                }
+              },
+              "runAfter": {
+                "Compose_Epic_Key": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Select_Epic_Keys_from_referencia": [
+              "Succeeded"
+            ]
+          }
+        },
+        "List_rows_present_in_referencia": {
+          "type": "OpenApiConnection",
+          "description": "pagination beallitasa 5000-re\nalap limit: 256",
+          "inputs": {
+            "parameters": {
+              "source": "https://axelhu.sharepoint.com/sites/POkltsKPI",
+              "drive": "b!oNk_Gu6F3Ueo7jpZSNkTgTwCqSAx3RdPvcGb9ZvZz8AJhXnTjUGRTYTskO2Qom8k",
+              "file": "014TG3ICXO7JMNG7X44JEJWBLAAYBDAC6F",
+              "table": "{9A6DD261-0640-4C08-8CB9-88000ADB303D}"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {
+            "Select_ID_and_Epic_Link": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "paginationPolicy": {
+              "minimumItemCount": 5000
+            }
+          },
+          "metadata": {
+            "01AAKL2QKNZ4VCSA3VFNDJWGW3GIIK3S5U": "/sandbox_jiraepics/referencia.xlsx",
+            "tableId": "{9A6DD261-0640-4C08-8CB9-88000ADB303D}",
+            "01AAKL2QLUPT4NULV3KRDZ6SDKABZISTRO": "/sandbox_jiraepics/referencia.xlsx",
+            "014TG3ICXO7JMNG7X44JEJWBLAAYBDAC6F": "/2023/referencia.xlsx"
+          }
+        },
+        "Select_Epic_Keys_from_referencia": {
+          "type": "Select",
+          "description": "Epic Key : item()?['Epic ID'']",
+          "inputs": {
+            "from": "@outputs('List_rows_present_in_referencia')?['body/value']",
+            "select": {
+              "Epic Key": "@item()?['Epic ID']"
+            }
+          },
+          "runAfter": {
+            "List_rows_present_in_referencia": [
+              "Succeeded"
+            ]
+          }
+        },
+        "List_rows_present_in_epics-import-PROTECBAC-4237": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+              "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+              "file": "01FSZZIXY2QEK2P5IS4VHKMFZAS7GEIY5Y",
+              "table": "TableForPowerAutomate"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {
+            "Delay_1_sec": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "paginationPolicy": {
+              "minimumItemCount": 5000
+            }
+          },
+          "metadata": {
+            "01FSZZIXY2QEK2P5IS4VHKMFZAS7GEIY5Y": "/epics/epics-import-PROTECBAC-4237.xlsx",
+            "tableId": "TableForPowerAutomate"
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

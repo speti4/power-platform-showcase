@@ -1,0 +1,18 @@
+{
+  "QualifiedValues": [
+    {
+      "Kind": "default.cds_mspp_entityform_forms",
+      "Namespace": "Basic Forms (Űrlapok)",
+      "Values": {
+        "Information": "0872118a-1343-4852-b3ca-df38a4af8aeb"
+      }
+    },
+    {
+      "Kind": "default.cds_mspp_entityform_forms",
+      "Namespace": "Basic Forms (Forms)",
+      "Values": {
+        "Information": "0872118a-1343-4852-b3ca-df38a4af8aeb"
+      }
+    }
+  ]
+}

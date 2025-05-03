@@ -1,0 +1,385 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "staticResults": {
+        "Update_IssueKeys.txt0": {
+          "status": "Succeeded",
+          "outputs": {
+            "statusCode": "OK"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "447cb3cd-7e6f-4e06-ad9e-90d1bd3083c2"
+          }
+        }
+      },
+      "actions": {
+        "Requests": {
+          "type": "Foreach",
+          "foreach": "@outputs('Delete_empty_row')",
+          "actions": {
+            "HTTP_GET_Issue": {
+              "type": "Http",
+              "description": "item()?['Kod']",
+              "inputs": {
+                "uri": "https://jira.profession.hu/rest/api/2/issue/@{item()?['Kod']}",
+                "method": "GET",
+                "authentication": {
+                  "type": "Basic",
+                  "username": "powerautomate",
+                  "password": "Profession2024"
+                }
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              },
+              "metadata": {
+                "operationMetadataId": "d7d79993-82f3-4bb9-b620-33296bbf856b"
+              }
+            },
+            "Compose_Resolution_Name": {
+              "type": "Compose",
+              "inputs": "@if(empty(body('HTTP_GET_Issue').fields.resolution), '', body('HTTP_GET_Issue').fields.resolution.name)",
+              "runAfter": {
+                "HTTP_GET_Issue": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose_TaskProps": {
+              "type": "Compose",
+              "inputs": [
+                {
+                  "Issue type": "@body('HTTP_GET_Issue').fields.issuetype.name",
+                  "Issue key": "@item()?['Kod']",
+                  "Reporter": "@body('HTTP_GET_Issue').fields.reporter.name",
+                  "Priority": "@body('HTTP_GET_Issue').fields.priority.name",
+                  "Epic link": "@body('HTTP_GET_Issue').fields.customfield_10006",
+                  "Komponens kod": "@body('HTTP_GET_Issue')['fields']?['project']?['key']",
+                  "Created": "@outputs('Compose_Created')",
+                  "Resolution Name": "@outputs('Compose_Resolution_Name')",
+                  "Resolutiondate": "@outputs('Compose_ResolutionDate')",
+                  "Status Name": "@body('HTTP_GET_Issue').fields.status.name",
+                  "Timeoriginal estimate": "@body('HTTP_GET_Issue').fields.timeoriginalestimate",
+                  "Timespent": "@body('HTTP_GET_Issue').fields.timespent"
+                }
+              ],
+              "runAfter": {
+                "Compose_Created": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose_TaskProps_Array": {
+              "type": "Compose",
+              "inputs": "@union(variables('TaskProps'), outputs('Compose_TaskProps'))",
+              "runAfter": {
+                "Compose_TaskProps": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Set_TaskProps": {
+              "type": "SetVariable",
+              "inputs": {
+                "name": "TaskProps",
+                "value": "@outputs('Compose_TaskProps_Array')"
+              },
+              "runAfter": {
+                "Compose_TaskProps_Array": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose_ResolutionDate": {
+              "type": "Compose",
+              "inputs": "@if(empty(body('HTTP_GET_Issue').fields.resolutiondate), '', formatDateTime(body('HTTP_GET_Issue').fields.resolutiondate,'yyyy.MM.dd.'))\n",
+              "runAfter": {
+                "Compose_Resolution_Name": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose_Created": {
+              "type": "Compose",
+              "inputs": "@formatDateTime(body('HTTP_GET_Issue').fields.created,'yyyy.MM.dd.')\n",
+              "runAfter": {
+                "Compose_ResolutionDate": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Delete_empty_row": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Initialize_TaskProps": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "TaskProps",
+                "type": "array"
+              }
+            ]
+          },
+          "runAfter": {
+            "Define_YEAR": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b2a386f4-480c-484b-b8c4-93efd44c5296"
+          }
+        },
+        "Create_CSV_table": {
+          "type": "Table",
+          "inputs": {
+            "from": "@variables('TaskProps')",
+            "format": "CSV"
+          },
+          "runAfter": {
+            "Requests": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {}
+          },
+          "runAfter": {
+            "Initialize_TaskProps": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Define_YEAR": {
+          "type": "Compose",
+          "description": "convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')",
+          "inputs": "@convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')",
+          "runAfter": {}
+        },
+        "Run_a_Child_Flow_-_JIRA_all_tasks_data_merge": {
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "2d71858b-ef2c-ef11-840a-002248a10a67"
+            }
+          },
+          "runAfter": {
+            "Create_archive_file": [
+              "Succeeded"
+            ],
+            "Create_file_-_all_tasksYYYY": [
+              "SUCCEEDED"
+            ]
+          }
+        },
+        "Get_file_content_worklogs_csv": {
+          "type": "OpenApiConnection",
+          "description": "worklogs_outputs('Define_YEAR').csv",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "path": "/Shared Documents/jira_riports/worklogs_@{outputs('Define_YEAR')}.csv",
+              "inferContentType": true
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "GetFileContentByPath",
+              "connectionName": "shared_sharepointonline"
+            }
+          },
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Compose_CSV_data": {
+          "type": "Compose",
+          "description": "base64tostring(outputs('Get_file_content_worklogs_csv')?['body']['$content'])",
+          "inputs": "@base64tostring(outputs('Get_file_content_worklogs_csv')?['body']['$content'])",
+          "runAfter": {
+            "Get_file_content_worklogs_csv": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Delete_carriage_return_chars": {
+          "type": "Compose",
+          "description": "replace(outputs('Compose_CSV_data'),decodeUriComponent('%0D'),'')",
+          "inputs": "@replace(outputs('Compose_CSV_data'),decodeUriComponent('%0D'),'')",
+          "runAfter": {
+            "Compose_CSV_data": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Compose_CSV_array": {
+          "type": "Compose",
+          "description": "chunk(split(replace(outputs('Delete_carriage_return_chars'),decodeUriComponent('%0A'),','),','),5)",
+          "inputs": "@chunk(split(replace(outputs('Delete_carriage_return_chars'),decodeUriComponent('%0A'),','),','),5)",
+          "runAfter": {
+            "Delete_carriage_return_chars": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Select": {
+          "type": "Select",
+          "description": "from: skip(outputs('Compose_CSV_array'),1)\nMap:\nKod - item()?[1]",
+          "inputs": {
+            "from": "@skip(outputs('Compose_CSV_array'),1)",
+            "select": {
+              "Kod": "@item()?[1]"
+            }
+          },
+          "runAfter": {
+            "Compose_CSV_array": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Delete_dupes": {
+          "type": "Compose",
+          "description": "union(body('Select'),body('Select'))",
+          "inputs": "@union(body('Select'),body('Select'))",
+          "runAfter": {
+            "Select": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Delete_empty_row": {
+          "type": "Compose",
+          "description": "delete last empty row\ntake(outputs('Delete_dupes'),add(length(outputs('Delete_dupes')),-1))",
+          "inputs": "@take(outputs('Delete_dupes'),add(length(outputs('Delete_dupes')),-1))",
+          "runAfter": {
+            "Delete_dupes": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Run_a_Child_Flow_-_dupe_remover": {
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "2d04e215-b058-ef11-bfe3-000d3ab9f3e2"
+            }
+          },
+          "runAfter": {
+            "Run_a_Child_Flow_-_JIRA_all_tasks_data_merge": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Create_file_-_all_tasksYYYY": {
+          "type": "OpenApiConnection",
+          "description": "concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "folderPath": "/Shared Documents/jira_riports",
+              "name": "all_tasks_@{outputs('Define_YEAR')}.csv",
+              "body": "@concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "CreateFile",
+              "connectionName": "shared_sharepointonline"
+            }
+          },
+          "runAfter": {
+            "Create_CSV_table": [
+              "Succeeded"
+            ]
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Create_archive_file": {
+          "type": "OpenApiConnection",
+          "description": "concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "folderPath": "/Shared Documents/archive",
+              "name": "all_tasks_@{outputs('Define_YEAR')}.csv",
+              "body": "@concat(uriComponentToString('%EF%BB%BF'),body('Create_CSV_table'))"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "CreateFile",
+              "connectionName": "shared_sharepointonline"
+            }
+          },
+          "runAfter": {
+            "Create_CSV_table": [
+              "SUCCEEDED"
+            ]
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

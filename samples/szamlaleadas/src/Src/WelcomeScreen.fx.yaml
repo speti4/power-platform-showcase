@@ -1,0 +1,35 @@
+"WelcomeScreen As screen.'phoneBrowseLayout_ver3.0'":
+
+    ContainerElements As groupContainer:
+        Height: =1136
+        Width: =640
+        ZIndex: =10
+
+        lblWelcomeScreenTitle As label:
+            Align: =Align.Center
+            Color: =RGBA(255, 255, 255, 1)
+            Fill: =RGBA(50, 60, 80, 1)
+            Height: =120
+            Size: =32
+            Text: ="Számla leadás"
+            Width: =640
+            ZIndex: =2
+
+        imgLogo0 As image:
+            Height: =128
+            Image: =profession_logo
+            Width: =640
+            Y: =1008
+            ZIndex: =3
+
+        ButtonNewForm As button:
+            Fill: =RGBA(74, 88, 159, 1)
+            Height: =204
+            OnSelect: =NewForm(EditForm1);Navigate(EditScreen1); Trace("Új számla/melléklet beküldése selected")
+            Size: =24
+            Text: ="Új számla/melléklet beküldése"
+            Width: =388
+            X: =126
+            Y: =509
+            ZIndex: =4
+

@@ -1,0 +1,792 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness-1": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedexcelonlinebusiness_6b366"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_sharepointonline-1": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence_daily": {
+          "type": "Recurrence",
+          "description": "Runs at 0:05 every day",
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Day",
+            "timeZone": "Central Europe Standard Time",
+            "schedule": {
+              "hours": [
+                "0"
+              ],
+              "minutes": [
+                5
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Run_script_to_convert_board_id_list": {
+          "type": "OpenApiConnection",
+          "description": "jiraworklog /board_id/board_id.xlsx rejtett table generalas",
+          "inputs": {
+            "parameters": {
+              "source": "groups/856b5c7b-4779-407c-80d1-0e34fda496fd",
+              "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+              "file": "01FSZZIX7I37WU335DMBELUX4GG6EGDWVG",
+              "scriptSource": "groups/9eae6b6a-69be-46fd-be72-a41fc4045d53",
+              "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "scriptId": "01AAKL2QOFTGJNBRK72NCZSPPBCMDBZOG5"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "RunScriptProdV2",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {
+            "Initialize_total": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW": "/user_list/jira_user_list.xlsx",
+            "01AAKL2QOFTGJNBRK72NCZSPPBCMDBZOG5": "/sandbox_jiraworklogs/convert_to_table.osts",
+            "tableId": null,
+            "operationMetadataId": "7ca099e3-995c-4896-a2c5-0b784ef862d2",
+            "01FSZZIX7I37WU335DMBELUX4GG6EGDWVG": "/board_id/board_id.xlsx"
+          }
+        },
+        "Delay_1_sec": {
+          "type": "Wait",
+          "inputs": {
+            "interval": {
+              "count": 1,
+              "unit": "Second"
+            }
+          },
+          "runAfter": {
+            "Run_script_to_convert_board_id_list": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a6a7f388-0ebc-4927-9103-b876393eee2a"
+          }
+        },
+        "List_rows": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+              "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+              "file": "01FSZZIX7I37WU335DMBELUX4GG6EGDWVG",
+              "table": "TableForPowerAutomate"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {
+            "Delay_1_sec": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW": "/user_list/jira_user_list.xlsx",
+            "tableId": "TableForPowerAutomate",
+            "operationMetadataId": "bf09130b-2ea8-412b-9378-7780a5da3367",
+            "01FSZZIX7I37WU335DMBELUX4GG6EGDWVG": "/board_id/board_id.xlsx"
+          }
+        },
+        "Apply_to_each": {
+          "type": "Foreach",
+          "foreach": "@outputs('List_rows')?['body/value']",
+          "actions": {
+            "Set_startAt_0": {
+              "type": "SetVariable",
+              "inputs": {
+                "name": "startAt",
+                "value": 0
+              }
+            },
+            "Do_until_-_paging": {
+              "type": "Until",
+              "description": "until isLast is true",
+              "expression": "@equals(variables('isLast'),true)",
+              "limit": {
+                "count": 60,
+                "timeout": "PT1H"
+              },
+              "actions": {
+                "HTTP_GET_sprint": {
+                  "type": "Http",
+                  "description": "https://jira.profession.hu/rest/agile/1.0/board/ item()?['board_id'] /sprint\n\nstartAt: var(startAt)\nstate: closed",
+                  "inputs": {
+                    "uri": "https://jira.profession.hu/rest/agile/1.0/board/@{item()?['board_id']}/sprint",
+                    "method": "GET",
+                    "queries": {
+                      "startAt": "@{variables('startAt')}",
+                      "state": "closed"
+                    },
+                    "authentication": {
+                      "type": "Basic",
+                      "username": "powerautomate",
+                      "password": "Profession2024"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  },
+                  "metadata": {
+                    "operationMetadataId": "eeed7845-6087-4f10-a728-6fad20fbc2ed"
+                  }
+                },
+                "Set_isLast": {
+                  "type": "SetVariable",
+                  "description": "outputs('HTTP_GET_sprint')?['body']?['isLast']",
+                  "inputs": {
+                    "name": "isLast",
+                    "value": "@outputs('HTTP_GET_sprint')?['body']?['isLast']"
+                  },
+                  "runAfter": {
+                    "Set_sprintData": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "71e57462-e912-4f77-9a8c-e60b16c5230d"
+                  }
+                },
+                "Increment_startAt_50": {
+                  "type": "IncrementVariable",
+                  "description": "lapozas",
+                  "inputs": {
+                    "name": "startAt",
+                    "value": 50
+                  },
+                  "runAfter": {
+                    "Set_isLast": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Select_sprintData": {
+                  "type": "Select",
+                  "description": "from: outputs('HTTP_GET_sprint')?['body']?['values']\n\nitem()?['id']\nitem()?['name']\nformatDateTime(item()?['activatedDate'],'yyyy.MM.dd.')\nitem()?['state']\n... board_number: items('Apply_to_each')?['board_id']\n",
+                  "inputs": {
+                    "from": "@outputs('HTTP_GET_sprint')?['body']?['values']",
+                    "select": {
+                      "board_id": "@items('Apply_to_each')?['board_id']",
+                      "sprint_id": "@item()?['id']",
+                      "name": "@item()?['name']",
+                      "ActivatedDate": "@formatDateTime(item()?['activatedDate'],'yyyy.MM.dd.')",
+                      "State": "@item()?['state']",
+                      "CompleteDate": "@formatDateTime(item()?['completeDate'],'yyyy.MM.dd.')",
+                      "EndDate": "@formatDateTime(item()?['endDate'],'yyyy.MM.dd.')",
+                      "StartDate": "@formatDateTime(item()?['startDate'],'yyyy.MM.dd.')"
+                    }
+                  },
+                  "runAfter": {
+                    "HTTP_GET_sprint": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Compose_sprintData": {
+                  "type": "Compose",
+                  "description": "sprintData merge:\nunion(variables('sprintData'),body('Select_sprintData'))",
+                  "inputs": "@union(variables('sprintData'),body('Select_sprintData'))",
+                  "runAfter": {
+                    "Select_sprintData": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Set_sprintData": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "sprintData",
+                    "value": "@outputs('Compose_sprintData')"
+                  },
+                  "runAfter": {
+                    "Compose_sprintData": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {
+                "Set_isLast_false": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Set_isLast_false": {
+              "type": "SetVariable",
+              "inputs": {
+                "name": "isLast",
+                "value": false
+              },
+              "runAfter": {
+                "Set_startAt_0": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "List_rows": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Initialize_startAt": {
+          "type": "InitializeVariable",
+          "description": "HTTP request lapozashoz valtozo",
+          "inputs": {
+            "variables": [
+              {
+                "name": "startAt",
+                "type": "integer"
+              }
+            ]
+          },
+          "runAfter": {}
+        },
+        "Initialize_isLast": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "isLast",
+                "type": "boolean"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_startAt": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6545d9dd-423c-4640-8c4f-cfa13d55cc95"
+          }
+        },
+        "Initialize_sprintData": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "sprintData",
+                "type": "array"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_isLast": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Create_CSV_table": {
+          "type": "Table",
+          "inputs": {
+            "from": "@variables('sprintData')",
+            "format": "CSV"
+          },
+          "runAfter": {
+            "Apply_to_each_filter_processed_sprints": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Filter_Date": {
+          "type": "Query",
+          "description": "item()['completeDate'] >= \nconcat(convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy'),'.01.01.')\nminden evet kovetkezo ev januar 10-en valtja",
+          "inputs": {
+            "from": "@variables('sprintData')",
+            "where": "@greaterOrEquals(item()['completeDate'],concat(convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy'),'.01.01.'))"
+          },
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          }
+        },
+        "incremental_file_update": {
+          "type": "Scope",
+          "description": "a korábbi adatokhoz hozzáfűzve updateli a sprint_2024.csv-t\n\nDEMO ALATT: amíg nince \"tegnapi adat\" sandbox_jiraworklogs > _flow_processing >sprint alatti üres fájlhoz mergeli az adatokat",
+          "actions": {
+            "Get_file_content": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "id": "%252fShared%2bDocuments%252fjira_riports%252fsprint.csv",
+                  "inferContentType": true
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileContent",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              },
+              "metadata": {
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fsprint%252fsprint_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/sprint/sprint_2024.csv",
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fsprint_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/sprint_2024.csv",
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fsprint_2024_test.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/sprint_2024_test.csv",
+                "%252fShared%2bDocuments%252fjira_riports%252fsprint_2024.csv": "/Shared Documents/jira_riports/sprint_2024.csv",
+                "%252fShared%2bDocuments%252fjira_riports%252fsprint.csv": "/Shared Documents/jira_riports/sprint.csv"
+              }
+            },
+            "Compose_merge_data": {
+              "type": "Compose",
+              "description": "base64ToString(body('Get_file_content')['$content'])\n\nskip(body('Create_CSV_table'),add(indexOf(body('Create_CSV_table'),decodeUriComponent('%0A')),1))",
+              "inputs": "@{base64ToString(body('Get_file_content')['$content'])}@{skip(body('Create_CSV_table'),add(indexOf(body('Create_CSV_table'),decodeUriComponent('%0A')),1))}",
+              "runAfter": {
+                "Get_file_content": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Create_file": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "folderPath": "/Shared Documents/jira_riports",
+                  "name": "sprint.csv",
+                  "body": "@outputs('Compose_merge_data')"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "CreateFile",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              },
+              "runAfter": {
+                "Compose_merge_data": [
+                  "Succeeded"
+                ]
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Create_CSV_table": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Select_sprint_IDs": {
+          "type": "Select",
+          "description": "sprint ID-k kigyujtese a sprint_tasks_yyyy.csv-hez\n\nitem()?['sprint_id']",
+          "inputs": {
+            "from": "@variables('sprintData')",
+            "select": {
+              "sprint_id": "@item()?['sprint_id']"
+            }
+          },
+          "runAfter": {
+            "Apply_to_each_filter_processed_sprints": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Filter_dupes": {
+          "type": "Compose",
+          "description": "union(body('Select_sprint_IDs'),body('Select_sprint_IDs'))",
+          "inputs": "@union(body('Select_sprint_IDs'),body('Select_sprint_IDs'))",
+          "runAfter": {
+            "Select_sprint_IDs": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Apply_to_each_sprint_ID": {
+          "type": "Foreach",
+          "foreach": "@outputs('Filter_dupes')",
+          "actions": {
+            "Set_startAt_to_0": {
+              "type": "SetVariable",
+              "inputs": {
+                "name": "startAt",
+                "value": 0
+              }
+            },
+            "Do_until": {
+              "type": "Until",
+              "description": "total <= startAt",
+              "expression": "@lessOrEquals(variables('total'),variables('startAt'))",
+              "limit": {
+                "count": 60,
+                "timeout": "PT1H"
+              },
+              "actions": {
+                "HTTP_GET_sprint_tasks": {
+                  "type": "Http",
+                  "description": "https://jira.profession.hu/rest/agile/1.0/sprint/ item()['sprint_id'] /issue",
+                  "inputs": {
+                    "uri": "https://jira.profession.hu/rest/agile/1.0/sprint/@{item()['sprint_id']}/issue",
+                    "method": "GET",
+                    "queries": {
+                      "fields": "flagged,issuetype,priority,project,resolution,resolutiondate,status,timetracking,customfield_11400,customfield_11401",
+                      "startAt": "@{variables('startAt')}",
+                      "maxResults": "50"
+                    },
+                    "authentication": {
+                      "type": "Basic",
+                      "username": "powerautomate",
+                      "password": "Profession2024"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  }
+                },
+                "Select_sprint_tasks_data": {
+                  "type": "Select",
+                  "description": "from: outputs('HTTP_GET_sprint_tasks')?['body']?['issues']\nitems('Apply_to_each_1')?['sprint_id']\nitem()?['key']\nif(item()['fields']['flagged'],1,0)\nitem()?['fields']?['issuetype']?['name']\nitem()?['fields']?['priority']?['name']\n...",
+                  "inputs": {
+                    "from": "@outputs('HTTP_GET_sprint_tasks')?['body']?['issues']",
+                    "select": {
+                      "sprint_id": "@items('Apply_to_each_sprint_ID')?['sprint_id']",
+                      "issue_id": "@item()?['key']",
+                      "flagged": "@if(item()['fields']['flagged'],1,0)",
+                      "issue type": "@item()?['fields']?['issuetype']?['name']",
+                      "priority": "@item()?['fields']?['priority']?['name']",
+                      "project": "@item()?['fields']?['project']?['key']",
+                      "resolution": "@item()?['fields']?['resolution']?['name']",
+                      "resolutionDate": "@item()?['fields']?['resolutiondate']",
+                      "status": "@item()?['fields']?['status']?['name']",
+                      "originalEstimate": "@item()?['fields']?['timetracking']?['originalEstimateSeconds']",
+                      "timeSpent": "@item()?['fields']?['timetracking']?['timeSpentSeconds']",
+                      "Dedicated_tester": "@item()?['fields']?['customfield_11400']?['displayName']",
+                      "Testing_estimation": "@item()?['fields']?['customfield_11401']"
+                    }
+                  },
+                  "runAfter": {
+                    "HTTP_GET_sprint_tasks": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Compose_sprint_tasks_data": {
+                  "type": "Compose",
+                  "inputs": "@union(variables('sprintTasksData'),body('Select_sprint_tasks_data'))",
+                  "runAfter": {
+                    "Select_sprint_tasks_data": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Set_sprintTasksData": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "sprintTasksData",
+                    "value": "@outputs('Compose_sprint_tasks_data')"
+                  },
+                  "runAfter": {
+                    "Compose_sprint_tasks_data": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Set_total": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "total",
+                    "value": "@outputs('HTTP_GET_sprint_tasks')?['body']?['total']"
+                  },
+                  "runAfter": {
+                    "Set_sprintTasksData": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Increment_startAt_plus_50": {
+                  "type": "IncrementVariable",
+                  "inputs": {
+                    "name": "startAt",
+                    "value": 50
+                  },
+                  "runAfter": {
+                    "Set_total": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {
+                "Set_startAt_to_0": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Sprint_ids_to_processed_sprint": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Initialize_sprintTasksData": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "sprintTasksData",
+                "type": "array"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_sprintData": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Initialize_total": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "total",
+                "type": "integer"
+              }
+            ]
+          },
+          "runAfter": {
+            "Initialize_sprintTasksData": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Create_CSV_table_2": {
+          "type": "Table",
+          "inputs": {
+            "from": "@variables('sprintTasksData')",
+            "format": "CSV"
+          },
+          "runAfter": {
+            "Apply_to_each_sprint_ID": [
+              "Succeeded"
+            ]
+          }
+        },
+        "incremental_file_update_2": {
+          "type": "Scope",
+          "description": "a korabbi adatokhoz hozzafuzve updateli a sprint_tasks_2024.csv-t",
+          "actions": {
+            "Get_file_content_2": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "id": "%252fShared%2bDocuments%252fjira_riports%252fsprint_tasks.csv",
+                  "inferContentType": true
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileContent",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              },
+              "metadata": {
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fsprint%252fsprint_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/sprint/sprint_2024.csv",
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fsprint%252fsprint_tasks_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/sprint/sprint_tasks_2024.csv",
+                "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252fsprint_tasks_2024.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/sprint_tasks_2024.csv",
+                "%252fShared%2bDocuments%252fjira_riports%252fsprint_tasks_2024.csv": "/Shared Documents/jira_riports/sprint_tasks_2024.csv",
+                "%252fShared%2bDocuments%252fjira_riports%252fsprint_tasks.csv": "/Shared Documents/jira_riports/sprint_tasks.csv"
+              }
+            },
+            "Compose_merge_data_2": {
+              "type": "Compose",
+              "description": "base64ToString(body('Get_file_content_2')['$content'])\n\nskip(body('Create_CSV_table_2'),add(indexOf(body('Create_CSV_table_2'),decodeUriComponent('%0A')),1))",
+              "inputs": "@{base64ToString(body('Get_file_content_2')['$content'])}@{skip(body('Create_CSV_table_2'),add(indexOf(body('Create_CSV_table_2'),decodeUriComponent('%0A')),1))}",
+              "runAfter": {
+                "Get_file_content_2": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Create_file_2": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+                  "folderPath": "/Shared Documents/jira_riports",
+                  "name": "sprint_tasks.csv",
+                  "body": "@outputs('Compose_merge_data_2')"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "CreateFile",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              },
+              "runAfter": {
+                "Compose_merge_data_2": [
+                  "Succeeded"
+                ]
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Create_CSV_table_2": [
+              "Succeeded"
+            ]
+          }
+        },
+        "List_rows_present_in_a_table": {
+          "type": "OpenApiConnection",
+          "description": "/sandbox_jiraworklogs/_flow_processing/sprint/_processed_sprints.xlsx\nsprint_id_Table",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "drive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "file": "01AAKL2QOZUTFRO6VHUBEZPCPLX5TUPMWZ",
+              "table": "{AFECE1CF-E5B8-4973-A722-86519EFC0C10}"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "connectionName": "shared_excelonlinebusiness-1"
+            }
+          },
+          "runAfter": {
+            "Set_sprintData_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01AAKL2QOZUTFRO6VHUBEZPCPLX5TUPMWZ": "/sandbox_jiraworklogs/_flow_processing/sprint/_processed_sprints.xlsx",
+            "tableId": "{AFECE1CF-E5B8-4973-A722-86519EFC0C10}"
+          }
+        },
+        "Set_sprintData_2": {
+          "type": "SetVariable",
+          "inputs": {
+            "name": "sprintData",
+            "value": "@body('Filter_Date')"
+          },
+          "runAfter": {
+            "Filter_Date": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Apply_to_each_filter_processed_sprints": {
+          "type": "Foreach",
+          "description": "outputs('List_rows_present_in_a_table')?['body/value']",
+          "foreach": "@outputs('List_rows_present_in_a_table')?['body/value']",
+          "actions": {
+            "Filter_sprintData": {
+              "type": "Query",
+              "description": "item()['sprint_id'] <> int(items('Apply_to_each_filter_processed_sprints')['sprint_id'])",
+              "inputs": {
+                "from": "@variables('sprintData')",
+                "where": "@not(equals(item()['sprint_id'],int(items('Apply_to_each_filter_processed_sprints')['sprint_id'])))"
+              }
+            },
+            "Set_sprintData_3": {
+              "type": "SetVariable",
+              "inputs": {
+                "name": "sprintData",
+                "value": "@body('Filter_sprintData')"
+              },
+              "runAfter": {
+                "Filter_sprintData": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "List_rows_present_in_a_table": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Sprint_ids_to_processed_sprint": {
+          "type": "Foreach",
+          "foreach": "@outputs('Filter_dupes')",
+          "actions": {
+            "Add_a_row_into_a_table": {
+              "type": "OpenApiConnection",
+              "description": "item()?['sprint_id']",
+              "inputs": {
+                "parameters": {
+                  "source": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+                  "drive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+                  "file": "01AAKL2QOZUTFRO6VHUBEZPCPLX5TUPMWZ",
+                  "table": "{AFECE1CF-E5B8-4973-A722-86519EFC0C10}",
+                  "item/sprint_id": "@item()?['sprint_id']"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                  "operationId": "AddRowV2",
+                  "connectionName": "shared_excelonlinebusiness-1"
+                }
+              },
+              "metadata": {
+                "01AAKL2QOZUTFRO6VHUBEZPCPLX5TUPMWZ": "/sandbox_jiraworklogs/_flow_processing/sprint/_processed_sprints.xlsx",
+                "tableId": "{AFECE1CF-E5B8-4973-A722-86519EFC0C10}"
+              }
+            }
+          },
+          "runAfter": {
+            "Filter_dupes": [
+              "Succeeded"
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

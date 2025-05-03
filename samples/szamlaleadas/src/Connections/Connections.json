@@ -1,0 +1,31 @@
+{
+  "ae00288a-a9f7-4d51-803f-1f0fde16da02": {
+    "appActions": [
+      "providers/PowerPlatform.Governance/Operations/Read",
+      "providers/PowerPlatform.Governance/Operations/Write"
+    ],
+    "connectionRef": {
+      "apiTier": "Standard",
+      "displayName": "SharePoint",
+      "iconUri": "https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1738/1.0.1738.4131/sharepointonline/icon.png",
+      "id": "/providers/microsoft.powerapps/apis/shared_sharepointonline",
+      "parameterHints": {},
+      "parameterHintsV2": {}
+    },
+    "datasets": {
+      "https://axelhu.sharepoint.com/sites/projekt-szamlaleadas": {
+        "dataSources": {
+          "Számla leadás": {
+            "tableName": "61ae7736-1d52-429c-a28a-2ffe4d9c178f"
+          }
+        }
+      }
+    },
+    "dataSources": [
+      "Számla leadás"
+    ],
+    "dependencies": {},
+    "dependents": [],
+    "id": "ae00288a-a9f7-4d51-803f-1f0fde16da02"
+  }
+}

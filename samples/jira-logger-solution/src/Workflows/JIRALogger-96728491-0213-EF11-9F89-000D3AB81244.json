@@ -1,0 +1,426 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedexcelonlinebusiness_6b366"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_sharepointonline-1": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "undefined",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence_daily": {
+          "type": "Recurrence",
+          "description": "Runs at 0:00 every day",
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "timeZone": "Central Europe Standard Time",
+            "schedule": {
+              "hours": [
+                "0"
+              ],
+              "minutes": [
+                0
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "0e9b2a86-9cdd-4f62-9fa4-904985f58b9a"
+          }
+        }
+      },
+      "actions": {
+        "Apply_to_each": {
+          "type": "Foreach",
+          "description": "JIRA worklogs flow rekurziv futtatasa minden worklogAuthor -ra\nchild flow letrehoz {id}{worklogauthor}.csv fajlokat sandbox_jiraworklogs\\_flow_processing\\worklogs mappaban",
+          "foreach": "@outputs('List_rows')?['body/value']",
+          "actions": {
+            "Run_a_Child_Flow_JIRA_worklogs": {
+              "type": "Workflow",
+              "description": "item()?['worklogAuthor']\nformatNumber(int(item()?['id']),'000')\noutputs('Define_YEAR')",
+              "inputs": {
+                "host": {
+                  "workflowReferenceName": "4586d7de-0213-ef11-9f89-000d3ab81244"
+                },
+                "body": {
+                  "text": "@item()?['worklogAuthor']",
+                  "text_1": "@{formatNumber(int(item()?['id']),'000')}",
+                  "text_2": "@{outputs('Define_YEAR')}"
+                }
+              },
+              "metadata": {
+                "operationMetadataId": "ccf84123-be58-41f5-8fcf-56cc8bd0ba9b"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_JIRA_user_list": [
+              "Succeeded"
+            ],
+            "Clear_worklogs_folder": [
+              "Succeeded"
+            ],
+            "Clear_nincs_worklog_folder": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "eaca2024-5636-4cd3-b7d9-d4e41330bce3"
+          }
+        },
+        "Define_YEAR": {
+          "type": "Compose",
+          "description": "minden eves lekerdezes kovetkezo ev januar 10-ig fut, ezert 10 nappal ezelottre kerdezunk ra, csak evet ad vissza:\nconvertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')",
+          "inputs": "@convertFromUtc(getPastTime(10,'Day'),'Central Europe Standard Time','yyyy')",
+          "runAfter": {
+            "Initialize_counter": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Get_JIRA_user_list": {
+          "type": "Scope",
+          "description": "jiraworklog sharepoint site /user_list/jira_user_list.xlsx fájlból worklogAuthorok beolvasása",
+          "actions": {
+            "List_rows": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+                  "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+                  "file": "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW",
+                  "table": "TableForPowerAutomate"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                  "operationId": "GetItems",
+                  "connectionName": "shared_excelonlinebusiness"
+                }
+              },
+              "runAfter": {
+                "Delay_1_sec": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW": "/user_list/jira_user_list.xlsx",
+                "tableId": "TableForPowerAutomate",
+                "operationMetadataId": "bf09130b-2ea8-412b-9378-7780a5da3367"
+              }
+            },
+            "Delay_1_sec": {
+              "type": "Wait",
+              "description": "neha failel a kovetkezo action, ha nincs delay",
+              "inputs": {
+                "interval": {
+                  "count": 1,
+                  "unit": "Second"
+                }
+              },
+              "runAfter": {
+                "Run_script_to_convert_worklogAuthor_list": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "a6a7f388-0ebc-4927-9103-b876393eee2a"
+              }
+            },
+            "Run_script_to_convert_worklogAuthor_list": {
+              "type": "OpenApiConnection",
+              "description": "jira_user_list.xlsx-ben hidden table letrehozasa az adatokkal",
+              "inputs": {
+                "parameters": {
+                  "source": "sites/axelhu.sharepoint.com,bf365277-1130-4072-af7a-f1f74640c55f,4141b638-222f-4a93-b50a-7a8162bd1a39",
+                  "drive": "b!d1I2vzARckCvevH3RkDFXzi2QUEvIpNKtQp6gWK9GjnH4gP4WgDYSrogyCFFZnjD",
+                  "file": "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW",
+                  "scriptSource": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+                  "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+                  "scriptId": "01AAKL2QOFTGJNBRK72NCZSPPBCMDBZOG5"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+                  "operationId": "RunScriptProdV2",
+                  "connectionName": "shared_excelonlinebusiness"
+                }
+              },
+              "metadata": {
+                "01FSZZIX7HRUR2XVLFRRGL3WUPNZUO4ONW": "/user_list/jira_user_list.xlsx",
+                "01AAKL2QOFTGJNBRK72NCZSPPBCMDBZOG5": "/sandbox_jiraworklogs/convert_to_table.osts",
+                "tableId": null,
+                "operationMetadataId": "7ca099e3-995c-4896-a2c5-0b784ef862d2"
+              }
+            }
+          },
+          "runAfter": {
+            "Define_YEAR": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Clear_worklogs_folder": {
+          "type": "Scope",
+          "description": "elozo napi temporary data torlese _flow_processing/worklogs mappabol",
+          "actions": {
+            "Get_files_(properties_only)": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                  "table": "f8ee1d88-446e-4bf5-9eae-5ee20c55f69e",
+                  "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs",
+                  "viewScopeOption": "Default"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileItems",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Apply_to_each_file": {
+              "type": "Foreach",
+              "foreach": "@outputs('Get_files_(properties_only)')?['body/value']",
+              "actions": {
+                "Delete_file": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                      "id": "@item()?['{Identifier}']"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "DeleteFile",
+                      "connectionName": "shared_sharepointonline-1"
+                    }
+                  },
+                  "metadata": {
+                    "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fworklogs%252fadam.jonacsik.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs/adam.jonacsik.csv",
+                    "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fworklogs%252fexcelfake.xlsx": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs/excelfake.xlsx"
+                  }
+                }
+              },
+              "runAfter": {
+                "Get_files_(properties_only)": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Define_YEAR": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Run_a_Child_Flow_-_JIRA_all_tasks": {
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "5870e878-0017-ef11-9f89-000d3ab81244"
+            }
+          },
+          "runAfter": {
+            "Run_JIRA_worklog_data_merge": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Run_JIRA_worklog_data_merge": {
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "567a7b2d-1813-ef11-9f89-000d3ab81244"
+            }
+          },
+          "runAfter": {
+            "Do_until_-_check_files_pre-merge": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bdd2db6e-4711-4265-b11f-979386bd0d2d"
+          }
+        },
+        "Clear_nincs_worklog_folder": {
+          "type": "Scope",
+          "description": "elozo napi temporary data torlese _flow_processing/nincs_worklog mappabol",
+          "actions": {
+            "Get_files_(properties_only)2": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                  "table": "f8ee1d88-446e-4bf5-9eae-5ee20c55f69e",
+                  "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/nincs_worklog",
+                  "viewScopeOption": "Default"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileItems",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Apply_to_each_file2": {
+              "type": "Foreach",
+              "foreach": "@outputs('Get_files_(properties_only)2')?['body/value']",
+              "actions": {
+                "Delete_file2": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                      "id": "@item()?['{Identifier}']"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "DeleteFile",
+                      "connectionName": "shared_sharepointonline-1"
+                    }
+                  },
+                  "metadata": {
+                    "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fworklogs%252fadam.jonacsik.csv": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs/adam.jonacsik.csv",
+                    "%252fMegosztott%2bdokumentumok%252fsandbox_jiraworklogs%252f_flow_processing%252fworklogs%252fexcelfake.xlsx": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs/excelfake.xlsx"
+                  }
+                }
+              },
+              "runAfter": {
+                "Get_files_(properties_only)2": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Define_YEAR": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Do_until_-_check_files_pre-merge": {
+          "type": "Until",
+          "description": "counter = length(outputs('List_rows')?['body/value'])\nellenorzi, hogy letrejott-e annyi fajl, mint ahany worklogauthor van a listaban\nha meg nem 30 sec mulva probalja ujra",
+          "expression": "@equals(variables('counter'),length(outputs('List_rows')?['body/value']))",
+          "limit": {
+            "count": 60,
+            "timeout": "PT1H"
+          },
+          "actions": {
+            "Get_files_count1": {
+              "type": "OpenApiConnection",
+              "description": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                  "table": "f8ee1d88-446e-4bf5-9eae-5ee20c55f69e",
+                  "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/worklogs",
+                  "viewScopeOption": "Default"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileItems",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Get_files_count2": {
+              "type": "OpenApiConnection",
+              "description": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/nincs_worklog",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://axelhu.sharepoint.com/sites/Sandboxsite-PowerAutomate",
+                  "table": "f8ee1d88-446e-4bf5-9eae-5ee20c55f69e",
+                  "folderPath": "/Megosztott dokumentumok/sandbox_jiraworklogs/_flow_processing/nincs_worklog",
+                  "viewScopeOption": "Default"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetFileItems",
+                  "connectionName": "shared_sharepointonline-1"
+                }
+              }
+            },
+            "Set_counter": {
+              "type": "SetVariable",
+              "description": "add(length(outputs('Get_files_count1')?['body/value']),length(outputs('Get_files_count2')?['body/value']))",
+              "inputs": {
+                "name": "counter",
+                "value": "@add(length(outputs('Get_files_count1')?['body/value']),length(outputs('Get_files_count2')?['body/value']))"
+              },
+              "runAfter": {
+                "Get_files_count1": [
+                  "Succeeded"
+                ],
+                "Get_files_count2": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Delay_1_min": {
+              "type": "Wait",
+              "inputs": {
+                "interval": {
+                  "count": 1,
+                  "unit": "Minute"
+                }
+              },
+              "runAfter": {
+                "Set_counter": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Initialize_counter": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "counter",
+                "type": "integer",
+                "value": 0
+              }
+            ]
+          },
+          "runAfter": {}
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

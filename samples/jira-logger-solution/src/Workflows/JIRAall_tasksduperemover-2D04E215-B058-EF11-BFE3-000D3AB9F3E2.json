@@ -1,0 +1,233 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline-1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedsharepointonline_d6e99"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_excelonlinebusiness-1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "pasu_sharedexcelonlinebusiness_6b366"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_file_content_-_all_tasks.csv": {
+          "runAfter": {},
+          "metadata": {
+            "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv": "/Shared Documents/jira_riports/all_tasks.csv"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "id": "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv",
+              "inferContentType": true
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline-1",
+              "operationId": "GetFileContent"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Compose_base64tostring": {
+          "runAfter": {
+            "Get_file_content_-_all_tasks.csv": [
+              "Succeeded"
+            ]
+          },
+          "type": "Compose",
+          "inputs": "@base64tostring(outputs('Get_file_content_-_all_tasks.csv')?['body']['$content'])",
+          "description": "base64tostring(outputs('Get_file_content_-_all_tasks.csv')?['body']['$content'])"
+        },
+        "Run_script_ImportCSV": {
+          "runAfter": {
+            "Compose_base64tostring": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6": "/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_dupe_remover.xlsx",
+            "01AAKL2QJ5IFA6JYHD25FZJYSQP2DNOES4": "/sandbox_jiraworklogs/_flow_processing/alltasks/ImportCSV.osts",
+            "tableId": null
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "drive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "file": "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6",
+              "scriptSource": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "scriptId": "01AAKL2QJ5IFA6JYHD25FZJYSQP2DNOES4",
+              "ScriptParameters/csvContent": "@outputs('Compose_base64tostring')"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "connectionName": "shared_excelonlinebusiness-1",
+              "operationId": "RunScriptProdV2"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          },
+          "description": "/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_dupe_remover.xlsx\nScript ugyanott: ImportCSV.osts\nCsvContent: outputs('Compose_base64tostring')"
+        },
+        "Run_script_FilterData": {
+          "runAfter": {
+            "Run_script_ImportCSV": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6": "/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_dupe_remover.xlsx",
+            "01AAKL2QJ5IFA6JYHD25FZJYSQP2DNOES4": "/sandbox_jiraworklogs/_flow_processing/alltasks/ImportCSV.osts",
+            "01AAKL2QJM3NFFMSRYP5A25WTA3PTIAWIE": "/sandbox_jiraworklogs/_flow_processing/alltasks/FilterData.osts",
+            "tableId": null
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "drive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "file": "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6",
+              "scriptSource": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "scriptId": "01AAKL2QJM3NFFMSRYP5A25WTA3PTIAWIE"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "connectionName": "shared_excelonlinebusiness-1",
+              "operationId": "RunScriptProdV2"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          },
+          "description": "/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_dupe_remover.xlsx\nScript ugyanitt: FilterData.osts"
+        },
+        "Run_script_ConvertToCSV": {
+          "runAfter": {
+            "Run_script_FilterData": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6": "/sandbox_jiraworklogs/_flow_processing/alltasks/all_tasks_dupe_remover.xlsx",
+            "01AAKL2QJ5IFA6JYHD25FZJYSQP2DNOES4": "/sandbox_jiraworklogs/_flow_processing/alltasks/ImportCSV.osts",
+            "01AAKL2QJM3NFFMSRYP5A25WTA3PTIAWIE": "/sandbox_jiraworklogs/_flow_processing/alltasks/FilterData.osts",
+            "01AAKL2QJKVUPGPRIYAZH26FTQ7RK3KRKI": "/sandbox_jiraworklogs/_flow_processing/alltasks/ConvertToCSV.osts",
+            "tableId": null
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "source": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "drive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "file": "01AAKL2QMKJIGD5LQ27VBLSMFYEXB47PX6",
+              "scriptSource": "sites/axelhu.sharepoint.com,736a41f2-e400-4181-a38b-396960e3ae33,73644a25-af2b-4018-8217-02c00514acdc",
+              "scriptDrive": "b!8kFqcwDkgUGjizlpYOOuMyVKZHMrrxhAghcCwAUUrNyIHe74bkT1S56uXuIMVfae",
+              "scriptId": "01AAKL2QJKVUPGPRIYAZH26FTQ7RK3KRKI"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness",
+              "connectionName": "shared_excelonlinebusiness-1",
+              "operationId": "RunScriptProdV2"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Update_file_-_all_tasks.csv": {
+          "runAfter": {
+            "Run_script_ConvertToCSV": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv": "/Shared Documents/jira_riports/all_tasks.csv"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://axelhu.sharepoint.com/sites/jiraworklog",
+              "id": "%252fShared%2bDocuments%252fjira_riports%252fall_tasks.csv",
+              "body": "@body('Run_script_ConvertToCSV')?['result']"
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline-1",
+              "operationId": "UpdateFile"
+            },
+            "authentication": {
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']",
+              "type": "Raw"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Update_file_-_all_tasks.csv": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {}
+            },
+            "statusCode": 200
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
