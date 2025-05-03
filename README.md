@@ -66,6 +66,8 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 </details>
 
+## [Pilot projekt: XFlower újragondolva Power Platformon](/pilot-project.md)
+
 <!-- ---
 
 ## Pilot projekt: szerződéskezelés újragondolva Power Platformon
