@@ -57,4 +57,5 @@ A tanulási folyamat nem öncélú volt: célzottan arra építettem fel, hogy e
 - Pilot tervezéstől éles bevezetésig átfogó felelősség -->
 
 ---
-[^1]: Forrás: [GemRain – Microsoft Power Platform Certification Roadmap](https://www.gemrain.net/post/microsoft-power-platform-certification-roadmap)
+Kép hivatkozások
+[^1]: [GemRain – Microsoft Power Platform Certification Roadmap](https://www.gemrain.net/post/microsoft-power-platform-certification-roadmap)

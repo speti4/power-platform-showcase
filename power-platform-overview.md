@@ -10,6 +10,7 @@ A Power Platform az alábbi low‑code eszközökből áll:
 - (Power BI, Power Pages, Power Virtual Agents – most nem fókusz)  
 
 ![power-platform-components](docs/power-platform-2.jpg)
+
 [^1]
 
 ## Miért jó választás IT szempontból?  
