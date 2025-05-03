@@ -62,6 +62,8 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 ### Egyéb minták - nem prod
 
+[samples/other/](samples/other/)
+
 </details>
 
 <!-- ---
