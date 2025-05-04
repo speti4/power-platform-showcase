@@ -82,7 +82,7 @@ A felhasználók számára készült alkalmazás várhatóan egy model-driven Po
 - **Értesítések:** A felhasználói élmény javítása érdekében bizonyos eseményeknél felugró értesítéseket (native értesítés mobilra) vagy email/Teams üzeneteket állíthatunk be. Például amikor egy partner visszaküldte aláírva a szerződést és azt feltöltik, a rendszer automatikusan kiküld egy "Szerződés aláírva" értesítést az érintetteknek.
 
 A model-driven alkalmazás testreszabása során betartjuk a Microsoft best practice-eket: minden testreszabást Solution-be csomagolva végzünk, nem a default environment "alapértelmezett megoldásában". A Microsoft határozottan javasolja saját Solution használatát a fejlesztői munkához, hogy a komponensek könnyen átvihetők legyenek másik környezetbe, és konzisztensen alkalmazzuk a prefixeket. Ennek köszönhetően az alkalmazásunk könnyen telepíthető lesz teszt és éles környezetbe is, és egyértelműen nyomon követhetőek lesznek a fejlesztési lépések, későbbi módosítások. [🔗Link](https://learn.microsoft.com/en-us/power-platform/alm/implement-healthy-alm)
-<!-- EDDIG -->
+
 ## Üzleti folyamatok megvalósítása a Power Platformon
 
 Fontos kiemelni, hogyan fognak az egyes xFlower üzleti folyamatok működni a Power Platformon. A cél az, hogy a folyamatok lépései és szabályai változatlanok maradjanak, csak a technológiai háttér változik. Az alábbiakban összefoglaljuk a főbb folyamatokat és azok új megvalósítását:
