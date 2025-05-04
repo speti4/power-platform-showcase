@@ -1,13 +1,16 @@
 # Power Platform áttekintés
+
 > Releváns komponensek általános áttekintése
 ---
-## Mi a Power Platform?  
 
-A Power Platform az alábbi low‑code eszközökből áll:  
-- [Power Apps](#mi-az-a-power-apps) – egyedi üzleti alkalmazások fejlesztéséhez (web + mobil)  
-- [Power Automate](#mi-az-a-power-automate) – folyamatok és integrációk automatizálására  
-- [Dataverse](#mi-az-a-dataverse) – központi adatplatform, strukturált adatkezeléshez  
-- (Power BI, Power Pages, Power Virtual Agents – most nem fókusz)  
+## Mi a Power Platform?
+
+A Power Platform az alábbi low‑code eszközökből áll:
+
+- [Power Apps](#mi-az-a-power-apps) – egyedi üzleti alkalmazások fejlesztéséhez (web + mobil)
+- [Power Automate](#mi-az-a-power-automate) – folyamatok és integrációk automatizálására
+- [Dataverse](#mi-az-a-dataverse) – központi adatplatform, strukturált adatkezeléshez
+- (Power BI, Power Pages, Power Virtual Agents – most nem fókusz)
 
 ![power-platform-components](docs/power-platform-2.jpg)
 [^1]
@@ -19,7 +22,8 @@ A Power Platform az alábbi low‑code eszközökből áll:
 - Biztonság és kontroll: Azure AD azonosítás (amit már használunk), role‑based access a Dataverse‑ben, Power Platform Admin Center a teljes átláthatósághoz (appok, flow‑k, felhasználók, logok, DLP policy‑k). IT kontroll megmarad.  
 - Skálázhatóság: Azure alapokon működik, nagyvállalati terhelésre tervezve (pl. Dynamics 365 is ezt használja). Ha nő az igény, elég kapacitást bővíteni – nem kell újraépíteni semmit.  
 
-## Mi az a Power Apps?  
+## Mi az a Power Apps?
+
 A Power Apps egy low‑code eszköz, amellyel webes és mobil üzleti alkalmazásokat fejleszthetünk gyorsan. A felületet vizuálisan építjük fel, az üzleti logikát pedig Power Fx formulákkal írjuk – ezek szintaxisa nagyon hasonlít az Excel‑képletekéhez.
 
 Két fő apptípus létezik:
@@ -28,9 +32,11 @@ Két fő apptípus létezik:
 - Model‑driven app – adatvezérelt megközelítés, ahol a Dataverse adatszerkezet határozza meg az app kinézetét. Ideális összetettebb üzleti folyamatokhoz (pl. ticket‑ vagy szerződéskezelés)
 
 ## Mi az a Power Automate?
+
 A Power Automate egy low‑code workflow‑eszköz, amellyel automatizált folyamatokat (cloud flows) hozhatunk létre. Egy flow mindig egy triggerrel (pl. beérkező e‑mail, gombnyomás, időzített futás vagy egy rekord létrehozása/változása adatbázisban) indul, majd sorban lefutó műveletekből (actions) épül fel, amelyeket feltételekkel, ciklusokkal és változókkal finomíthatunk. A több mint 1000 előre elkészített connector segítségével pár kattintással összeköthetjük az Office 365‑öt, a Google Drivet, Teams‑et, az SAP‑t, a Jirat vagy bármely más SaaS‑t, és akár saját (custom) connector is létrehozható.
 
 Három fő flowtípus létezik:
+
 - Cloud flow – felhőalapú integráció, amely automatikus (event‑alapú), azonnali vagy ütemezett módon futtatható.
   > Jira Logger automatizmus, jóváhagyási és adatbáziskezelési folyamatok Számla leadás appban
 - Desktop flow – RPA‑alapú robot, amely Windows‑os gépen a felhasználói felületet vezérelve automatizál web‑ és asztali alkalmazásokat, így legacy rendszerekbe is képes adatot rögzíteni (pl. tömeges Excel‑adatbevitel egy régi ERP‑be)
@@ -39,9 +45,11 @@ Három fő flowtípus létezik:
 Gyakori use‑case‑ek: jóváhagyási láncok, valós idejű értesítések, fájlszinkronizálás, adatgyűjtés és ‑továbbítás különféle rendszerek között.
 
 ## Mi az a Dataverse?
+
 A Dataverse egy Microsoft által menedzselt, felhőalapú relációs adatplatform (korábban Common Data Service), amelyet kifejezetten a Power Platform‑hoz optimalizáltak. Az adatokat táblákban (standard vagy egyéni) tároljuk, melyek felépítése megegyezik a klasszikus relációs adatbázisokéval.
 
 Fő beépített képességek:
+
 - Gazdag adattípus‑készlet – a hagyományos szöveg / szám / dátum mezőkön túl elérhetők választólisták, keresők, valamint file‑ és image‑típusok nagyobb bináris tartalmakhoz
 - Kapcsolatok és üzleti logika – definíció‑szinten hozhatunk létre 1‑N, N‑N kapcsolatokat, üzleti szabályokat, kiszámított vagy roll‑up oszlopokat, valamint audit‑ és verziókövetést, mindezt low‑code módon a Maker‑portálon.
 - Role‑based + row‑level biztonság – a Dataverse szerepkör‑alapú (RBAC) és sor‑/mező‑szintű jogosultságmodellel védi az adatokat; a szerepkörök öröklődnek üzleti egységek és csapatok között, a legmagasabb jogosultság érvényesül
