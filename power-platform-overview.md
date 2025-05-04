@@ -61,20 +61,6 @@ A Dataverse tehát nem csupán tároló, hanem egy komplett, skálázható adat�
 ![dataverse-service-breakdown](docs/dataverse-service-breakdown-1.jpg)
 [^2]
 
-<!-- ### Pro‑code integráció lehetőségei  
-
-A Power Platform nem zárja ki a hagyományos fejlesztés integrációját. 
-- Power Apps Component Framework (PCF) – saját UI vezérlők fejlesztése JavaScript/TypeScript nyelven.  
-- Custom connectors / API integráció – Power Apps‑ből lehetőség van REST API hívásokra, Azure Functions futtatására.  
-- ALM támogatás – appok verziókövetése, Git tárolása, dev‑test‑prod környezetek kialakítása megoldható, a vállalati DevOps folyamatokhoz igazítva.  
-
-## Összefoglalva  
-
-A Power Apps egy olyan eszköz, amely:  
-- gyors (napok‑hetek alatt kész megoldásokat hoz),  
-- rugalmas (canvas és model‑driven megközelítések),  
-- kiterjeszthető (pro‑code irányba is),  
-- és az IT kezében marad (governance, jogosultságok, verziókezelés).   -->
 ---
 Kép hivatkozások
 

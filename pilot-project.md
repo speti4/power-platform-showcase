@@ -1,5 +1,7 @@
 # Fejlesztési terv az xFlower szerződéskezelő alkalmazás Power Platform alapú kiváltására
 
+## [Alapfogalmak, áttekintés](/power-platform-overview.md)
+
 ## Kiindulási helyzet és célkitűzések
 
 Az xFlower egy szerződéskezelő rendszer, amely több összetett folyamatot támogat: szerződéskötés, módosítás, felmondás, véleményezés, javítás, stb. A cél a meglévő funkciók teljes körű újraimplementálása a [Microsoft Power Platform](/power-platform-overview.md/#mi-a-power-platform) eszközeivel (Microsoft Dataverse, Power Apps és Power Automate) úgy, hogy a folyamatok azonos módon működjenek, de a megoldás rugalmasan bővíthető legyen a jövőben. A tervezést a Microsoft hivatalos ajánlásai mentén végzem, figyelembe véve az alkalmazás architektúráját, az ALM-et (alkalmazás-életciklus menedzsment), az adatvédelmet és a licencelést.

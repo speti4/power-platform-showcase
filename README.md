@@ -2,8 +2,6 @@
 
 Az elmúlt hónapokban célzottan, rendszerszinten tanultam a Microsoft Power Platform technológiát, azzal a szándékkal, hogy ne csak App Maker, hanem **Developer és Solution Architect** szinten is átlássam a működését.
 
-## [Alapfogalmak, áttekintés](/power-platform-overview.md)
-
 <details>
     <summary>
         <h2>Power Platform kompetenciák</h2>
@@ -48,7 +46,7 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 </details>
 
-<details open>
+<details>
     <summary>
         <h2> Hands-on tapasztalatok</h2>
     </summary>
@@ -71,6 +69,8 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 </details>
 
-## [Pilot projekt: XFlower újragondolva Power Platformon](/pilot-project.md)
+## Pilot projekt: XFlower újragondolva Power Platformon
+
+[/pilot-project.md](/pilot-project.md)
 
 [^1]: Kép hivatkozás [GemRain – Microsoft Power Platform Certification Roadmap](https://www.gemrain.net/post/microsoft-power-platform-certification-roadmap)
