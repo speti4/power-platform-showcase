@@ -43,7 +43,7 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
     </summary>
 
 > Elméleti tudás validáció
-> 
+
 [Microsoft Learn Transcript link - Szőke Péter](https://learn.microsoft.com/en-gb/users/speti/transcript/7k2lzf94gq2z9gl)
 
 </details>

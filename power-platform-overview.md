@@ -61,7 +61,6 @@ A Dataverse tehát nem csupán tároló, hanem egy komplett, skálázható adat�
 ![dataverse-service-breakdown](docs/dataverse-service-breakdown-1.jpg)
 [^2]
 
-
 <!-- ### Pro‑code integráció lehetőségei  
 
 A Power Platform nem zárja ki a hagyományos fejlesztés integrációját. 
