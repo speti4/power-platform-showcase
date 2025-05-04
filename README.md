@@ -37,7 +37,7 @@ Fejlesztői szint: Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok 
 Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, irányítja a fejlesztést, felügyeli a governancet, a megfelelőséget és külső rendszerek integrációját.
 </details>
 
-<details>
+<details open>
     <summary>
         <h2> MS Learn transcriptem</h2>
     </summary>
@@ -48,7 +48,7 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 
 </details>
 
-<details>
+<details open>
     <summary>
         <h2> Hands-on tapasztalatok</h2>
     </summary>

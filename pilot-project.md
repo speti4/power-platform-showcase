@@ -119,45 +119,77 @@ A szerepköröket az elvárásokhoz igazítjuk, és a Dataverse szerepkörökön
 
 ## Quick Wins - fejlesztési ötletek
 
-Már a fejlesztés korai szakaszában érdemes néhány olyan funkciót megvalósítani vagy felmutatni, amelyek rövid idő alatt elkészíthetők, de látványos előnyt nyújtanak a felhasználók számára. Ezek a "quick win" fejlesztések segítenek a projekt elfogadtatásában és a végfelhasználók meggyőzésében is. Néhány javaslat:
+Az alábbi ötletek közös jellemzője, hogy kis ráfordítással megvalósíthatók, nem gátolják a fő fejlesztési ütemtervet, viszont jelentős üzleti értéket demonstrálnak. Ezeket párhuzamosan, a prototípus fázisban is elkezdhetjük:
 
-- Szerződés-lejárat értesítések: Implementáljunk egy ütemezett Power Automate folyamatot, ami például minden reggel ellenőrzi a Dataverse-ben, van-e 30 napon belül lejáró aktív szerződés, és ha igen, küld egy összefoglaló e-mailt az érintett felelősöknek vagy egy Teams üzenetet egy csoportnak. Ez gyorsan megvalósítható (néhány óra alatt egy prototípus) és azonnali érték, mert proaktív figyelmeztetést ad – elkerülhetők a véletlenül lejárt szerződések.
-- Dynamics 365-szerű irányítópult: Készítsünk egy dashboardot a Power Appsben, ami grafikonon mutatja például a szerződések státusz szerinti megoszlását (hány tervezet, mennyi véleményezés alatt, hány aláírásra vár, stb.), és listákat a felhasználóhoz rendelt aktuális feladatokról. Ezt a modellvezérelt appban néhány konfigurációval össze lehet rakni, és demonstrálja a vezetőknek is a rendszer erejét (átláthatóságot ad). Például egy kördiagram a státuszokról vagy a szerződés típusokról, illetve egy lista a "Ma határidős feladatokról".
-- E-mail integráció és sablonok: Mutassuk be, hogy a rendszerből egy kattintással lehet szabványos e-mailt küldeni. Pl. egy "Értesítés küldése partnernek" gomb, ami automatikusan generál egy e-mailt a partner kontaktjának a szerződés adataival. Ehhez kihasználhatjuk a Dataverse e-mail sablon funkcionalitását vagy a Power Automate e-mail küldést. Az érték abban rejlik, hogy nem kell külön levelezőbe átlépni, csökkenti a hibázás esélyét (pl. mindig egységes a tárgy és formátum).
-- Mobil hozzáférés: Mivel a Power Apps (főleg a modellvezérelt alkalmazás) alapból reszponzív, egy gyors nyereség, hogy a felhasználók mobilon vagy tableten is eléredik a szerződésadatokat a Power Apps mobil alkalmazáson keresztül. Készíthetünk egy rövid bemutatót arról, hogyan lehet egy szerződést lekérdezni vagy jóváhagyni telefonon. Ez modernizálja a felhasználói élményt az xFlower-hez képest, ha az korábban nem volt mobil-barát.
-- Microsoft Teams integráció: A jogi és beszerzési folyamatok sokszor Teams-ben is kommunikálódnak. Egy egyszerű, de látványos fejlesztés, ha beállítunk egy Teams értesítést: például amikor egy szerződés jóváhagyásra indul, a kijelölt jóváhagyó Teams-en is kap egy értesítést (Adaptive Card formában, amiből egyből jóvá is hagyhatja vagy elutasíthatja a kérelmet). Ezt a Power Automate integrációval megoldjuk. A hatás: kevesebb e-mail, gyorsabb reakció, aminek a vezetők örülnek.
-- AI Builder előnézet (jövőbe mutató): Ha van rá lehetőség, demózhatjuk, hogy a rendszer képes AI-val kiszedni információkat dokumentumokból (pl. egy aláírt PDF-ből automatikusan kinyer bizonyos metaadatokat). Ez ugyan licenchez kötött (AI Builder credit), és nem elsődleges, de egy prototípus szintjén bemutatható, hogy a platform milyen bővíthetőséget kínál a jövőben (pl. intelligens szerződésszöveg-elemzés).
-- Power BI riport: Gyors nyereség lehet egy összefoglaló riport készítése Power BI-ban a szerződésadatokból (összekapcsolva a Dataverse-szel). Például top10 partner szerződésszáma, éves bontásban szerződéskötések, stb. Ezt be lehet ágyazni a Power Apps felületbe is. A felsővezetésnek ez értékes mutatókat adhat egyből.
-
-A fenti quick win ötletek közös jellemzője, hogy kis ráfordítással megvalósíthatók, nem gátolják a fő fejlesztési ütemtervet, viszont jelentős üzleti értéket demonstrálnak. Ezeket párhuzamosan, a prototípus fázisban is elkezdhetjük, hogy a 2-3 hetes prototípus demó során már láthatók legyenek.
+1. **Szerződés-lejárat értesítések:** Egy ütemezett Power Automate folyamat, ami például minden reggel ellenőrzi a Dataverseben, van-e 30 napon belül lejáró aktív szerződés, és ha igen, küld egy összefoglaló e-mailt vagy egy Teams üzenetet az érintett felelős(ök)nek.
+2. **Dynamics 365-szerű irányítópult:** Egy dashboard Power Appsben, ami grafikonon mutatja például a szerződések státusz szerinti megoszlását (hány tervezet, mennyi véleményezés alatt, hány aláírásra vár, stb), és listákat a felhasználóhoz rendelt aktuális feladatokról. Például egy kördiagram a státuszokról vagy a szerződés típusokról, illetve egy lista a "Közeli határidős feladatokról". [Minta1](/docs/model-driven-app-sample1.jpg), [Minta2](/docs/dynamics-365-ui.jpg)
+3. **E-mail integráció és sablonok:** Például egy "Értesítés küldése partnernek" gomb, ami automatikusan generál egy e-mailt a partner kontaktjának a szerződés adataival. Ehhez kihasználhatjuk a Dataverse e-mail sablon funkcionalitását vagy a Power Automate e-mail küldést. Nem kell külön levelezőbe átlépni, csökkenti a hibázás esélyét és egységes formátumot ad a leveleknek. [🔗Link](https://learn.microsoft.com/en-us/power-apps/user/email-template-create)
+4. **Mobil hozzáférés:** Mivel a Power Apps alapból responsive, könnyű megoldani, hogy a felhasználók mobilon vagy tableten is elérjék a szerződésadatokat Power Apps mobilappon keresztül. Készíthetünk egy rövid bemutatót arról, hogyan lehet egy szerződést lekérdezni vagy jóváhagyni telefonon.
+5. **Microsoft Teams integráció:** A Power Automate Approvals jóváhagyási folyamat a Teams beépített funkciójára támaszkodik. A felelős jóváhagyó(k) email mellett Adaptive Card formában is kapnak értesítést, amiből egyből jóvá is hagyhatják vagy elutasíthatja a kérelmet, indokolhatják döntésüket. Ezen az elven működik a [Számla leadó app](/README.md/#számlaleadás-app) is.
+6. **AI Builder előnézet:** Ha van rá lehetőség (AI builder credit), demózhatom, hogy a rendszer képes AI-val kiszedni információkat dokumentumokból, pl egy PDF-ből automatikusan kinyer bizonyos metaadatokat. Ez ugyan nem elsődleges, de egy prototípus szintjén meg tudom mutatni, hogy a platform milyen AI alapú bővíthetőséget kínál a jövőben.
+7. **Power BI riport:** Adat alapú riportokat készíthetünk Power BI-ban is, amiket beágyazhatunk a Power Apps felületbe. Ehhez külön Power BI licenszekre is szükség lenne az app felhasználóinak.
 
 ## Fejlesztési ütemterv és mérföldkövek
 
-A projekt időkerete két fő szakaszt említ: egy 2-3 hetes prototípus elkészítése, majd 5-7 hét alatt a teljes funkcionalitású alkalmazás élesítése. Az alábbi ütemterv javasolt ennek megvalósítására:
-    • 0. hét – Előkészítés: Környezetek létrehozása és hozzáférések beállítása. A fejlesztő a saját Developer environment környezetében kezdi a munkát, mely korlátozás nélküli Dataverse használatot enged neki (a Power Apps Developer Plan egy ingyenes fejlesztői környezetet biztosít teljes Dataverse és Power Automate képességekkel​learn.microsoft.com). Ellenőrizzük, hogy a szükséges Power Platform licenc rendelkezésre áll (a fejlesztőnek Power Apps és Automate premium joga van). Felmérjük az xFlower-ből migrálandó adatokat (ha kell, exportálunk néhány mintát, de a migráció fő lépései később).
-    • 1-2. hét – Alapok és prototípus:
-        ○ Elkészítjük a Dataverse adatmodellt: létrehozzuk az entitásokat (Szerződés, Partner stb.), mezőket, kapcsolatokkal.
-        ○ Felépítjük a modellvezérelt alkalmazás első verzióját: legalább a Szerződés és Partner entitások űrlapjaival és nézeteivel.
-        ○ Implementáljuk a kulcsfontosságú Power Automate folyamatok közül néhányat: pl. egy egyszerű jóváhagyási flow-t a szerződéskötéshez (tervezet -> jóváhagyás), illetve egy értesítő flow-t.
-        ○ A prototípusban demonstráljuk a szerződéskötés fő lépéseit: új rögzítés, belső véleményezés (jóváhagyás), csatolmány feltöltése, státuszváltás aláítottra. Lehetőség szerint ezt működőképesen mutatjuk be tesztfelhasználókkal.
-        ○ Közben megvalósítunk 1-2 quick win funkciót is a prototípus részeként (pl. lejárati értesítés, dashboard), hogy a demo még meggyőzőbb legyen.
-        ○ A prototípus végére (2-3. hét) tartunk egy bemutatót a kulcsérintetteknek, begyűjtjük a visszajelzéseket. A prototípus egy minimal viable product jellegű megoldás, ami már bizonyítja, hogy a fő folyamatok működnek a Power Platformon.
-    • 3-5. hét – Teljes funkcionalitás implementálása:
-        ○ Kiterjesztjük a fejlesztést az összes folyamat lefedésére: megcsináljuk a Módosítás, Felmondás, Javítás folyamatok automatizációját Power Automate-tal, integrálva az alkalmazásba (gombok és logika összekapcsolása).
-        ○ Finomítjuk az alkalmazás UI-t: hozzáadjuk a szükséges űrlapmezőket, üzleti szabályokat (pl. dinamikus megjelenés/elrejtés), véglegesítjük a nézeteket. Ebben a fázisban beépítjük a jogosultsági logikát is az app viselkedésébe (például egyes gombok csak akkor látszódjanak, ha a usernek van joga vagy ha releváns a státusz).
-        ○ Tesztadatokkal feltöltjük a rendszert (esetleg migrálunk néhány valódi szerződést az xFlower-ből teszt céljából) és elkezdjük a funkcionális tesztelést. A fejlesztői környezetben maga a fejlesztő és a megrendelő kulcsfelhasználói (ha hozzáférést kapnak) próbálhatják ki.
-        ○ Közben elkészítjük a szerepköröket és beállítjuk a biztonságot. Ezt egy tesztfelhasználó készlettel validáljuk (pl. egy user, akinek csak olvasási joga van, valóban nem tud szerkeszteni stb.).
-        ○ Ha vannak integrációk (pl. levelezés, SharePoint), beállítjuk azokat is ebben az időszakban. A SharePoint integrációt konfiguráljuk (dokumentumtár összerendelése a Dataverse entitással), és leteszteljük a fájl feltöltéseket.
-        ○ Felhasználói dokumentáció/jegyzetek írása elkezdődik a funkciókról, hogy mire megy élesbe, legyen útmutató.
-    • 6-7. hét – Tesztelés, finomhangolás és élesítés:
-        ○ Áttelepítjük az alkalmazást egy UAT (User Acceptance Testing) környezetbe vagy a végleges éles környezet egy előkészített verziójába. Ez a telepítés már megoldáscsomag formájában történik, amit exportálunk a fejlesztői környezetből és importálunk a UAT-ba. (Ekkor már a managed solution-t használjuk, hogy a végleges környezetben védjük a megoldást a véletlen módosításoktól.)
-        ○ A felhasználók (üzleti tesztelők) a UAT-ban végigmennek a valós élet szcenáriókon, ellenőrzik, hogy minden folyamat az elvárt eredményt adja. Itt még felmerülhet pár módosítási igény vagy hibajavítás, amit a fejlesztő visszavezet a Dev környezetben, majd újra kiad egy frissített megoldáscsomagot.
-        ○ Elkészítjük a végleges migrációs tervet: ha sok adatot kell áthozni az xFlower-ből, akkor a 6-7. héten futtatunk egy migrációs szkriptet vagy adatfolyamot (Dataflow/ETL) a régi rendszerből az újba. Ha kevés adat van, manuális importálást is lehet csinálni Excelből (Dataverse import funkció).
-        ○ Teljesítmény és terhelés teszt: mivel low-code, ez nem akkora gond, de ha pl. több ezer szerződés van, megnézzük a lekérdezések sebességét, indexeket állítunk be ahol kell (Dataverse automatikusan is kezel indexeket a keresőmezőkhöz).
-        ○ Élesítés: A projekt végén (7. hét) az alkalmazást átadjuk az éles környezetnek. Az éles környezetbe importáljuk a megoldást, beállítjuk az éles adatforrásokat (pl. éles SharePoint site csatlakoztatása, e-mail küldésnél végleges címek). A felhasználókat hozzárendeljük a megfelelő biztonsági szerepkörökhöz. Ekkor már a felhasználóknak rendelkezniük kell a szükséges licencekkel (ld. következő szakasz).
-        ○ Az első éles futás során a fejlesztő és adminok szorosan figyelik a rendszert (support), hátha valami finomhangolás kell. Mivel a Power Platformon gyorsan lehet módosítani (egy konfiguráció változtatás és új megoldás import néhány órán belül kivitelezhető), az utolsó finom simításokra is van lehetőség akár az élesítés utáni időszakban is, minimális kieséssel.
-Ez a menetrend azt feltételezi, hogy a fejlesztő(k) dedikáltan tudnak dolgozni a projekten. Az agilis iterációk elve mentén haladunk: a 2-3 hetes prototípus egy sprint, majd további 1-2 hetes sprintekben építjük ki a teljes funkcionalitást, folyamatosan bevonva a business felhasználókat a visszajelzésekbe. Így 7 hét alatt el lehet jutni a stabil éles verzióhoz. Fontos, hogy a timeline realista maradjon: ha valami csúszna, priorizáljuk a legfontosabb funkciókat előre, a kevésbé létfontosságú extrák (pl. AI, komplex integrációk) későbbre ütemezhetők.
-Licencelési szempontok és környezetek
+A projektet három fő szakaszra bonthatjuk:
+
+|   | Leírás | Becsült időtartam |
+|---|---------------------------------------------------------------------------------------------------|---|
+| 1 | Interjú kulcsfelhasználókkal, PO-val -> megvalósítási terv véglegesítése, MVP funkciók kijelölése | 2 hét |
+| 2 | Prototípus / MVP elkészítése                                                                      | 3-4 hét |
+| 3 | Teljes funkcionalitású alkalmazás élesítése                                                       | 5-7 hét |
+
+Az alábbi ütemtervet javaslom:
+
+### Előkészületek (0. hét)
+
+Ha a fejlesztőnek szánt [licenszek](#licencelési-terv) rendelkezésre állnak, elkezdhető a [Dataverse environmentek](#környezetstratégia) létrehozása és hozzáférések beállítása. Ez előfeltétele a munka megkezdésének, mivel a licenszekkel kapacitást is vásárolunk. Developer környezetben kezdjük a munkát, mely korlátozás nélküli Dataverse használatot enged.
+
+### 1-2. hét - Interjúk, megvalósítási terv véglegesítés
+
+- **Interjú kulcsfelhasználókkal:** felhasználói igények mentén módosítjuk, véglegesítjük a megvalósítási tervet
+- **Minimal viable product (MVP):** meghatározzuk az MVP funkcióit
+- **CRM kapcsolat meghatározása:** felmérjük, hogy custom data connectort és real time elérést, vagy időzített pl. napi adatáttöltés Dataflow-val lesz optimális
+- **Sample data:** lehetőség szerint XFlower-ből exportált adatok és szerződésminták
+
+### 3-6. hét – Alapok és prototípus
+
+- **Elkészítjük a Dataverse adatmodellt:** létrehozzuk az entitásokat (Szerződés, Partner stb.), mezőket és kapcsolatokkal
+- **Sharepoint site léterhozás:** létrehozunk 1-1 Sharepoint sitet teszt és éles Dokumentumtárnak. Az eléréseket mindenhol környezeti változókban kezeljük, így oldjuk meg, hogy életciklus menedzsment során ne essenek szét az entitások
+- **Model-driven app első verziója:** legalább a Szerződés és Partner entitások űrlapjaival és nézeteivel
+- **Implementáljuk az MVP funkciókat:** az interjúk során meghatározott funkciók felépítése
+- **Funkcionális tesztelés:** Tesztadatokkal feltöltjük a rendszert, esetleg migrálunk néhány valódi szerződést az xFlower-ből teszt céljából és elkezdjük a funkcionális tesztelést
+- Közben megvalósítunk **1-2 quick win funkciót** is a prototípus részeként (pl. lejárati értesítés, dashboard), hogy a demo még meggyőzőbb legyen
+- A prototípus végére (5-6. hét) tartunk **egy bemutatót** a kulcsfelhasználóknak, begyűjtjük a **visszajelzéseket**.
+
+### 7-11. hét – Teljes funkcionalitás implementálása
+
+- **Összes folyamat lefedése:** megcsináljuk a Módosítás, Felmondás, Javítás folyamatok automatizációját Power Automate-tel, integrálva az alkalmazásba -> gombok és logika összekapcsolása
+- **Finomítjuk az alkalmazás UI-t:** hozzáadjuk a szükséges űrlapmezőket, üzleti szabályokat (pl. dinamikus megjelenés/elrejtés), véglegesítjük a nézeteket
+- **Szerepkörök és biztonság:** Elkészítjük a szerepköröket és beállítjuk a biztonságot. Ezt egy tesztfelhasználó készlettel validáljuk (pl. egy user, akinek csak olvasási joga van, valóban nem tud szerkeszteni stb.).
+- **Jogosultsági logika beépítése:** Például egyes gombok csak akkor látszódjanak, ha a usernek van joga, vagy ha releváns a státusz
+- **Integrációk:**  levelezés, SharePoint és CRM integráció beállítása. A SharePoint integrációt konfiguráljuk (dokumentumtár összerendelése a Dataverse entitással), és leteszteljük a fájl feltöltéseket.
+- **User dokumentáció:** elkezdjük összeállítani a how-to doksikat. Ennek jó alapja lehet az XFlower jelenlegi dokumentációja, és a végleges fejlesztési terv
+
+### 12-13. hét – Tesztelés, finomhangolás és élesítés
+
+- Áttelepítjük az alkalmazást egy **UAT (User Acceptance Testing)** környezetbe vagy a végleges éles környezet egy előkészített verziójába. Ez a telepítés már Solution pack formájában történik, amit exportálunk a fejlesztői környezetből és importálunk a UAT környezetbe. Ekkor már a managed solution-t használjuk, hogy a végleges környezetben védjük a megoldást a véletlen módosításoktól. [🔗Link](https://learn.microsoft.com/en-us/power-platform/alm/solution-concepts-alm)
+- **UAT:** A felhasználók, tesztelők a UAT-ban végigmennek a valós scenariokon, ellenőrzik, hogy minden folyamat az elvárt eredményt adja. Bíztatjuk a tesztelőket, hogy ne csak happy path teszteket csináljanak, és dokumentálják hiba esetén: a hiba keletkezésének helyét, várt eredményt és kapott eredményt. Itt még fel fog merülni pár módosítási igény vagy hibajavítás, amit a visszavezetünk a Dev környezetben, majd frissítésként adjuk át a Test / Prod környezetbe.
+- **Elkészítjük a végleges migrációs tervet:** ha sok adatot kell áthozni az xFlower-ből, akkor az utolsó héten futtatunk egy migrációs szkriptet vagy Dataflow-t a régi rendszerből az újba. Ha kevés adat van, manuális importálást is lehet csinálni Dataverse import funkcióval. [🔗Link](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/dataverse-odata-dataflows-migration)
+- **Teljesítmény és terhelés teszt:** ez nem fog gondot okozni, de ha pl. több ezer szerződés van, megnézzük a lekérdezések sebességét, indexeket állítunk be ahol kell. Dataverse automatikusan is kezel indexeket a keresőmezőkhöz.
+- **Élesítés:** A projekt végén az alkalmazást átvisszük éles környezetbe. Beállítjuk az éles adatforrásokat: SharePoint site, CRM, e-mail küldésnél végleges címek. A felhasználókat hozzárendeljük a megfelelő biztonsági szerepkörökhöz. Ekkor már a felhasználóknak rendelkezniük kell a szükséges [licencekkel](#licencelési-terv).
+- **Az első éles futás során** a fejlesztő és kulcsfelhasználók szorosan figyelik a rendszert. Mivel a Power Platformon gyorsan lehet módosítani (egy konfiguráció változtatás és új megoldás import néhány órán belül kivitelezhető), az utolsó simításokra van lehetőség akár az élesítés utáni időszakban is, minimális kieséssel.
+
+Ez a menetrend azt feltételezi, hogy dedikáltan tudok dolgozni a projekten. Az agilis iterációk elve mentén haladnék. Ha kéthetes sprint időszakokkal számolunk:
+
+- Az interjú időszak és előkészületek: 1 sprint
+- Prototípus / MVP: ~2 sprint
+- Majd további 3-4 sprint időszak alatt építeném ki a teljes funkcionalitást, folyamatosan bevonva a business felhasználókat a visszajelzésekbe
+
+Így 3-4 hónap alatt el lehet jutni a stabil éles verzióhoz.
+
+## Licencelési terv
+
 A megoldás licencelési tervét a következők jellemzik:
     • A fejlesztést egy Power Apps Developer Plan környezetben végezzük, ami a fejlesztőnek teljes funkcionalitást biztosít (Dataverse, premium connectorok, korlátlan app és flow fejlesztés) díjmentesen a fejlesztéshez​learn.microsoft.com. Ezzel a prototípus és a fejlesztés során nem merülnek fel licenckorlát miatti akadályok. (Üzleti adatok szempontjából ez egy különálló, teszt jellegű környezet marad.)
     • Az éles rendszer felhasználói számára a javaslat a Power Apps per app licencek használata. Ez azt jelenti, hogy minden felhasználó, aki használni fogja az új szerződéskezelő appot, rendelkezik egy alkalmazásonkénti licenccel, amely feljogosítja egy meghatározott Power App (illetve a hozzá tartozó 1-2 app) futtatására. A per app licenc magában foglalja a Dataverse (premium adatforrás) használatát és a kapcsolódó Power Automate flow-k futtatását az adott alkalmazás kontextusában​learn.microsoft.com. A Microsoft dokumentációja alapján a per app licencet nem közvetlenül a felhasználókhoz rendeljük hozzá, hanem először a Power Platform admin centerben allokáljuk az adott környezethez, majd amikor az appot megosztjuk a felhasználóval, automatikusan fogyaszt egy licencet a keretből​learn.microsoft.com. Ez rugalmas, mert pl. 20 felhasználóra veszünk 20 per app licencet, az admin centerben hozzárendeljük az éles környezethez, és utána ők gond nélkül használhatják az appot.
@@ -171,9 +203,14 @@ Felül kell vizsgálni azonban:
     • A Power Automate API hívás limitek: per app licenc esetén kicsit alacsonyabb (mint per user plan-nél). Ha nagyon sok flow fut nagyon gyakran, figyelni kell a napi API call számokra is. A jelenlegi tervezett terhelésnél ez valószínűleg nem gond (pár száz szerződés művelet naponta maximum, ami bőven a limit alatt van).
     • A fejlesztői környezet korlátja, hogy nem használható élesre – ez benne is van a Microsoft feltételeiben, hogy developer plan environment csak fejlesztésre van, productionra nem legális használni​community.powerplatform.com. Ezt betartjuk: külön éles környezet lesz megfelelő licencekkel.
 Összességében a licencstratégia elegendőnek tűnik a megvalósításhoz. A Power Platform adminisztrátor az admin centerben nyomon tudja követni a per app licencek kihasználtságát egy jelentésben​learn.microsoft.com, így monitorozható, hány licenc fogyott és ki használja. Ha a felhasználói kör bővülne, könnyen skálázható a modell további per app licencek vétele és kiosztása révén.
-Alkalmazás életciklus-kezelése (ALM) és verziókövetés
+
+## Alkalmazás életciklus-kezelése (ALM) és verziókövetés
+
 A professzionális Power Platform fejlesztés elengedhetetlen része az alkalmazás életciklusának menedzsmentje (ALM). Célunk, hogy a fejlesztéstől az éles üzemig kontrollált, ismételhető módon juttassuk el a megoldást, minimalizálva a hibalehetőségeket és biztosítva a változások nyomon követését.
-Környezetstratégia: A Microsoft ajánlása, hogy legalább külön fejlesztői (Dev) és éles (Prod) környezetet használjunk, és lehetőség szerint legyen egy teszt/UAT környezet is a kettő között​learn.microsoft.com. Ennek megfelelően:
+
+### Környezetstratégia
+
+A Microsoft ajánlása, hogy legalább külön fejlesztői (Dev) és éles (Prod) környezetet használjunk, és lehetőség szerint legyen egy teszt/UAT környezet is a kettő között​learn.microsoft.com. Ennek megfelelően:
     • A fejlesztés a saját Dev environmentben zajlik (fejlesztői plan környezet vagy egy sandbox környezet, amelyhez a fejlesztő admin joga van). Itt unmanaged módon dolgozunk a megoldáson.
     • Létrehozunk egy Test/UAT környezetet, amelyben a kulcsfelhasználók jóváhagyhatják a fejlesztést élesítés előtt. Ez a környezet licenc szempontból lehet egy átmeneti sandbox (ha a licenc engedi), vagy az éles környezet egy sandbox klónja. A per app licenceket ide is át lehet menetileg irányítani a tesztelőknek. Fontos, hogy a tesztkörnyezet konfigurációja (pl. kapcsolatok, csatlakozók) minél inkább utánozza az éleset, de éles adatokat még ne tartalmazzon (ha migrálunk adatot, az csak anonimizált vagy részleges legyen a tesztben, a GDPR miatt is).
     • Az éles környezet a végleges használat helye, ide csak a letesztelt megoldás kerül fel.
