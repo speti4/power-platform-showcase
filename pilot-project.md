@@ -301,7 +301,7 @@ A szerződéskezelő rendszer személyes adatokat és üzleti bizalmas informác
 
 ## Összefoglalás
 
-A fent bemutatott terv egy átfogó, moduláris és bővíthető megoldást vázol az xFlower szerződéskezelő kiváltására a Microsoft Power Platform segítségével. Az architektúra középpontjában a Dataverse áll, amely robusztus adatkezelést és biztonságot nyújt, míg a Power Apps egy testreszabott, de gyorsan kialakítható felhasználói felületet biztosít a működéshez. A Power Automate a háttérben automatizálja a munkafolyamatokat, legyen szó jóváhagyásokról, értesítésekről vagy integrációkról, biztosítva, hogy a folyamatok digitálisan, hatékonyan történjenek.
+A fent bemutatott terv egy átfogó, moduláris és bővíthető megoldást vázol az xFlower szerződéskezelő kiváltására a Microsoft Power Platform segítségével. Az architektúra középpontjában a Dataverse áll, amely robusztus adatkezelést és biztonságot nyújt, míg a Power Apps egy testreszabott, de gyorsan kialakítható felhasználói felületet biztosít a működéshez. A Power Automate a háttérben automatizálja a munkafolyamatokat, legyen szó jóváhagyásokról, értesítésekről vagy integrációkról, biztosítva, hogy a folyamatok hatékonyan történjenek.
 
 A terv kitér az összes fontos szempontra:
 
