@@ -318,7 +318,7 @@ A Microsoft által nyújtott hivatalos dokumentációkra és best practice-ekre 
 
 > in-line hivatkozások mellett
 
-- xFlower meglévő rendszer dokumentáció – a jelenlegi folyamatok leírása, amelyek alapján történt a megfeleltetés
+- xFlower meglévő rendszer dokumentáció – a jelenlegi folyamatok leírása, amelyek alapján történt a megfeleltetés - szenzitív adatok miatt ide nem került feltöltésre
 
 Microsoft Official
 
