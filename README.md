@@ -37,7 +37,7 @@ Fejlesztői szint: Alkalmazáséletciklus-kezelés (ALM) és DevOps gyakorlatok 
 Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, irányítja a fejlesztést, felügyeli a governancet, a megfelelőséget és külső rendszerek integrációját.
 </details>
 
-<details open>
+<details>
     <summary>
         <h2> MS Learn transcriptem</h2>
     </summary>
@@ -72,25 +72,5 @@ Architekt szint: a komplex vállalati megoldások teljes tervezéséért felel, 
 </details>
 
 ## [Pilot projekt: XFlower újragondolva Power Platformon](/pilot-project.md)
-
-<!-- ---
-
-## Pilot projekt: szerződéskezelés újragondolva Power Platformon
-
-### Üzleti kihívás
-
----
-
-## 👤 IT Solution Architect szerepvállalás
-
-A tanulási folyamat nem öncélú volt: célzottan arra építettem fel, hogy egy teljes projektet **Solution Architectként** tudjak végigvinni.
-
-### Kompetenciák:
-- Teljes platformismeret (Power Apps, Automate, Dataverse, ALM, Azure)
-- Technikai architektúra tervezés
-- Kommunikáció és egyeztetés üzleti és IT oldal között
-- Pilot tervezéstől éles bevezetésig átfogó felelősség -->
-
----
 
 [^1]: Kép hivatkozás [GemRain – Microsoft Power Platform Certification Roadmap](https://www.gemrain.net/post/microsoft-power-platform-certification-roadmap)
